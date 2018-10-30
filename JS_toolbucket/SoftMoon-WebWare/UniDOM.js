@@ -1,5 +1,5 @@
-/*  UniDOM 2.0  December 24, 2014
- *  copyright © 2013, 2014 Joe Golembieski, SoftMoon-WebWare
+﻿/*  UniDOM 2.1  July 31, 2015
+ *  copyright © 2013, 2014, 2015 Joe Golembieski, SoftMoon-WebWare
  *  http://softmoon-webware.com/UniDOM_instructions.htm
  *
 		This program is free software: you can redistribute it and/or modify
@@ -50,6 +50,7 @@ var UniDOM=function(element, applyDirect, passData)  {  /* ALTERNATE ARGUMENTS:
 									 (Array→[…may contain any number of legal arguments to this UniDOM function including nested Arrays…], applyDirect, passData)
 									 (element‖ElementWrapper‖Array‖userData, applyDirect, passData=true)
 */
+	if (!element)  return null;
 	element=xElement(element);
 	if (UniDOM.isElementNode(element))  {
 		if (CSSEngine  &&  typeof arguments[1] == 'string')  return UniDOM(UniDOM.$(arguments[1], element), arguments[2], arguments[3]);
@@ -69,7 +70,7 @@ var UniDOM=function(element, applyDirect, passData)  {  /* ALTERNATE ARGUMENTS:
 
 	var CSSEngine;  //private
 
-	function $(CSSString, element, objFltr, applyDirect, powerSelect)  {
+	function $query(CSSString, element, objFltr, applyDirect, powerSelect)  {
 		var EWA=new UniDOM.ElementWrapperArray(CSSEngine.call(xElement(element), CSSString), false, applyDirect);
 		if (EWA.length && (objFltr || powerSelect || UniDOM.powerSelect))  objectify(EWA, objFltr, applyDirect, powerSelect);
 		return EWA;  }
@@ -86,8 +87,8 @@ UniDOM.$=function() {
 	else
 	if (typeof window.Slick == 'function')   CSSEngine=function(s) {return Slick(s, this)};   // http://mootools.net/docs/core/Slick/Slick
 	if (CSSEngine)  {
-		UniDOM.$=$;          // auto-plugin Engine
-		return $.apply(UniDOM, arguments);  }
+		UniDOM.$=$query;          // auto-plugin Engine
+		return $query.apply(UniDOM, arguments);  }
 	else
 	throw new Error("“UniDOM.$” requires “Sizzle.js” or “Slick.js” or the native “querySelectorAll” method (or similar CSSEngine) but none is installed.\n  See:\n  http://sizzlejs.com/\n  http://mootools.net/docs/core/Slick/Slick");  }
 // if you don’t want to use Sizzle, Slick, or a similar package, remove the above function from UniDOM,
@@ -112,7 +113,49 @@ UniDOM.MS_exploder=MS_exploder; //publicly available
 	function arrayify(v)  {return  (v instanceof Array) ? v : [v];}
 	function getEventType(eT)  {eT=eT.toLowerCase().match( /^(?:on)?(.+)$/ );  return eT[1];}
 
-	var handlerCounter=0, eventCounter=0;
+	var handlerCounter=0, eventCounter=0,
+			legacyEvents={// list of real events recognized by legacy MSIE
+		//<body> and <frameset> Events
+		load:true,
+		unload:true,
+		error:true,
+		//Form Events
+		blur:true,
+		change:true,
+		focus:true,
+		focusin:true,
+		focusout:true,
+		reset:true,
+		select:true,
+		submit:true,
+		//Image Events
+		abort:true,
+		//Keyboard Events
+		keydown:true,
+		keypress:true,
+		keyup:true,
+		//Mouse Events
+		click:true,
+		dblclick:true,
+		mousedown:true,
+		mousemove:true,
+		mouseout:true,
+		mouseover:true,
+		mouseup:true,
+		mouseenter:true,
+		mouseleave:true,
+		mousewheel:true,
+		//UI Events
+		contextmenu:true,
+		copy:true,
+		cut:true,
+		domactivate:true,
+		domfocusin:true,
+		domfocusout:true,
+		hashchange:true,
+		paste:true,
+		resize:true,
+		scroll:true };
 
 UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 	element=xElement(element);
@@ -133,9 +176,11 @@ UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 			else  continue;  }
 
 		if (document.attachEvent  &&  (MS_exploder!==9  ||  UniDOM.addEventHandler.retroMSIE9))  {
-			wrapper[i]=function(event, captured)  {  //old MSIE
+				//old MSIE
+			wrapper[i]=function(event, captured)  { // “captured” is used internally during the ==simulated== capturing-&-bubbling phases
 				if (!event)  event=window.event;
-				var j,  pass=userArgs.slice(0);  pass.unshift(event);
+				var j,  is_customEvent=!legacyEvents[event.type],
+						pass=userArgs.slice(0);  pass.unshift(event);
 				if (!captured)  {
 					event.MSIE=true;
 					event.target=       event.srcElement;
@@ -144,10 +189,10 @@ UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 					event.charCode=     event.keycode;
 					event.stopPropagation=function() {this.cancelBubble=true;  this.cancelCapture=true;};
 					event.preventDefault =function() {this.returnValue=false;};  }
-				if (!captured  &&  event.type.match( /click|mouse|resize|scroll/ ))  {
-					var capturers=getCapturersInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView);  // ← ElementNode || window || document
+				if (!captured  &&  (event.type.match( /click|mouse|resize|scroll/ )  ||  is_customEvent))  {
+					capturers=getCapturersInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView);  // ← ElementNode || window || document
 					if (capturers.length)  {
-						var ancestors=new Array,  p=event.target,  rV,  phase=event.eventPhase,  capturerFired;
+						var ancestors=new Array,  p=element,  rV,  phase=event.eventPhase,  capturerFired;
 						while (p=p.parentNode)  {ancestors.unshift(p);}
 						for (p=0; p<ancestors.length; p++)  {
 							for (j=0; j<capturers.length; j++)  {
@@ -169,8 +214,8 @@ UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 						if (typeof handler[j]['on'+event.type] == 'function')  handler[j]['on'+event.type].apply(handler[j], pass);
 						else if (typeof handler[j].handleEvent == 'function')  handler[j].handleEvent.apply(handler[j], pass);
 						else  handler[j].apply(element, pass);  }  }
-				if (capturerFired)  {
-					event.captured=true;
+				if (capturerFired  ||  (is_customEvent  &&  event.canBubble  &&  !captured))  {
+					event.captured=capturerFired;
 					event.eventPhase=3;
 					getAllEventsInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView, false);
 					for (p=ancestors.length; --p>=0;)  {
@@ -182,7 +227,10 @@ UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 			wrapper[i].MSIE=true;
 			if (typeof element._UniDOM_attachEvent_ == 'function')
 				element._UniDOM_attachEvent_('on'+etype, wrapper[i]);
-			else  element.attachEvent('on'+etype, wrapper[i]);  }
+			else  element.attachEvent('on'+etype, wrapper[i]);
+			if (!legacyEvents[etype])  {  //MSIE will allow binding of any type, but may not allow synthetic dispatching (Event Generation) of custom types
+				getCustomEventsInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView);
+				customEvents.push(wrapper[i]);  }  }
 
 		else
 		if (document.addEventListener)  {
@@ -204,14 +252,14 @@ UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 		added[eventType[i]]=new UniDOM.EventHandler(element, etype, handler, useCapture, wrapper[i], userArgs);  }
 	return added;  }
 UniDOM.addEventHandler.errorOnDoubleBind=true;  // false quietly ignores double-binds
-UniDOM.addEventHandler.retroMSIE9=null;        // true  will use old MSIE “attachEvent” w/simulated-capture, & “fireEvent” for Event-generation
+UniDOM.addEventHandler.retroMSIE9=false;       // true  will use old MSIE “attachEvent” w/simulated-capture, & “fireEvent” for Event-generation
 																							 // false will use Standard “addEventListener,” & “dispatchEvent” for Event-generation
 																							 // null  will use Standard “addEventListener,” & “dispatchEvent”+“fireEvent” for Event-generation
 UniDOM.addEventHandler.apply=applyToElement; // (element, Array→[eventType, handler, useCapture])
 UniDOM.addEventHandler._apply_=Function.prototype.apply;
 
 	//private
-	var addingHandler=false,  eventedWindows=new Array,  allEvents;
+	var addingHandler=false,  eventedWindows=new Array,  allEvents, capturers, customEvents;
 
 // (PS don't forget addEventHandler returns a plain Object with properties that relate event-types to “EventHandler”s:
 //  added=UniDOM.addEventHandler(e, 'onclick', h);  added.onclick.handler.push(another_h);  added.onclick.remove();
@@ -245,19 +293,39 @@ UniDOM.EventHandler=function(element, eventType, handler, useCapture, wrapper, u
 			id='h'+(handlerCounter++);
 	getAllEventsInWindow(w, true);
 	allEvents[id]=this;
-	if (useCapture  &&  (wrapper.MSIE  ||  MS_exploder===9))
-		getCapturersInWindow(w).push(this);
+	if (useCapture  &&  (wrapper.MSIE  ||  MS_exploder===9))  {
+		getCapturersInWindow(w);
+		capturers.push(this);  }
+	if (!legacyEvents[eventType]  &&  (wrapper.MSIE  ||  MS_exploder===9))  {
+		getCustomEventsInWindow(w);
+		customEvents.push(this);  }
 	this.id=id;
 	this.element=element;
 	this.eventType=eventType;
 	this.handler=handler;
 	this.useCapture=useCapture;
 	this.wrapper=wrapper;
-	this.userArgs=userArgs;  }
+	this.userArgs=userArgs;
+	this.MSIE=wrapper.MSIE;  }
 
 UniDOM.EventHandler.prototype.remove=function()  {
-	UniDOM.removeEventHandler(this);
-	this.id=false;  }
+	if (!UniDOM.isElementNode(this.element)  &&  !UniDOM.isWindow(this.element))
+		throw new Error("Can not remove “UniDOM.EventHandler”: its “element reference” has been corrupted.");
+	var d=this.element.ownerDocument  ||  this.element.document  ||  this.element,
+			w=d.defaultView;
+	getAllEventsInWindow(w, false);
+	if (allEvents[this.id] !== this)  throw new Error("Can not remove “UniDOM.EventHandler”: its “id” has been corrupted.");
+	if (this.element.removeEventListener)  this.element.removeEventListener(this.eventType, this.wrapper, this.useCapture);
+	if (this.element.detachEvent)  this.element.detachEvent('on'+this.eventType, this.wrapper);
+	delete allEvents[this.id];
+	this.id=false;
+	if (MS_exploder && MS_exploder<=9)  {
+		getCapturersInWindow(w);
+		for (var i=0; i<capturers.length; i++)  {if (capturers[i]===this)  {capturers.splice(i, 1);  break;}}
+		if (!legacyEvents[this.eventType])  {
+			getCustomEventsInWindow(w);
+			for (i=0; i<customEvents.length; i++)  {if (customEvents[i]===this)  {customEvents.splice(i, 1);  break;}}  }  }
+	cleanWindow(w);  }
 
 
 // When using third-party software on the same page with UniDOM,
@@ -268,10 +336,6 @@ UniDOM.enable_oldMSIE_capture=function()  {
 	if (typeof document.attachEvent !== 'function')  return false;
 	Element.prototype._UniDOM_attachEvent_=Element.prototype.attachEvent;
 	Element.prototype.attachEvent=function(eType, handler) {UniDOM.addEventHandler(this, eType, handler);};
-	if (MS_exploder===9)  {
-		Element.prototype._UniDOM_addEventListener_=Element.prototype.addEventListener;
-		Element.prototype.addEventListener=function(eType, handler, useCapture) {
-			UniDOM.addEventHandler(this, eType, handler, useCapture);  };  }
 	return true;  }
 
 
@@ -279,8 +343,9 @@ UniDOM.getEventHandler=function(element, eventType, handler, useCapture)  {
 	element=xElement(element);
 	eventType=getEventType(eventType);
 	handler=arrayify(handler);
-	var EH, id, j;
-	getAllEventsInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView, false);
+	var EH, id, j,
+			d=element.ownerDocument  ||  element.document  ||  element;
+	getAllEventsInWindow(d.defaultView, false);
 	if (allEvents)  for (id in allEvents)  {
 		EH=allEvents[id];
 		if (element===EH.element  &&  eventType===EH.eventType  &&  useCapture==EH.useCapture
@@ -296,87 +361,118 @@ UniDOM.getEventHandler._apply_=Function.prototype.apply;
 	function getAllEventsInWindow(w, makeNew)  {
 		for (var i in eventedWindows)  {if (w===eventedWindows[i].window)  return allEvents=eventedWindows[i].allEvents;}
 		if (!makeNew)  return allEvents=false;
-		var ref={window:w, allEvents:new Object, capturers:new Array};  //capturers is only utilized by old MSIE
+		var ref={window:w, allEvents:new Object, capturers:new Array, customEvents:new Array};  //capturers & customEvents are only utilized by old MSIE
 		eventedWindows.push(ref);
 		if (w.addEventListener)  w.addEventListener('unload', UniDOM.removeAllEventHandlers, false);
 		else
 		if (w.attachEvent)  w.attachEvent('onunload', UniDOM.removeAllEventHandlers);
 		return allEvents=ref.allEvents;  }
 	function getCapturersInWindow(w)  { //  ♪ ♫ ♪ I’m a capturah; soul adventurah… … … ♫ ♪ ♫
-		for (var i in eventedWindows)  {if (w===eventedWindows[i].window)  return eventedWindows[i].capturers;}  }
+		for (var i in eventedWindows)  {if (w===eventedWindows[i].window)  return capturers=eventedWindows[i].capturers;}  }
+	function getCustomEventsInWindow(w)  {
+		for (var i in eventedWindows)  {if (w===eventedWindows[i].window)  return customEvents=eventedWindows[i].customEvents;}  }
 
 
 UniDOM.removeEventHandler=function(element, eventType, handler, useCapture)  {
 															//  (my_EventHandler)                             //←preferred:  my_EventHandler.remove();
-	var EH, w=false, cptrs;
-	if (arguments[0] instanceof UniDOM.EventHandler)  {
+	var EH;
+	if (arguments[0] instanceof UniDOM.EventHandler)
 		EH=arguments[0];
-		w=(EH.element.ownerDocument  ||  EH.element.document  ||  EH.element).defaultView;
-		getAllEventsInWindow(w, false);
-		if (allEvents[EH.id] !== EH)  throw new Error("Can not remove “UniDOM.EventHandler”: its “id” has been corrupted.");  }
 	else  {
 		EH=UniDOM.getEventHandler(element, eventType, handler, useCapture);
-		if (EH===false)  throw new Error("Can not remove unknown event: \nElement: "+element+" id: "+element.id+"\neventType: "+eventType+" useCapture: "+useCapture+"\n"+handler);  }
-	if (EH.element.removeEventListener)  EH.element.removeEventListener(EH.eventType, EH.wrapper, EH.useCapture);
-	if (EH.element.detachEvent)  EH.element.detachEvent('on'+EH.eventType, EH.wrapper);
-	delete allEvents[EH.id];
-	capturers=getCapturersInWindow(w || (EH.element.ownerDocument  ||  EH.element.document  ||  EH.element).defaultView);
-	for (var i=0; i<capturers.length; i++)  {if (capturers[i]===EH)  {capturers.splice(i, 1);  break;}}
-	cleanWindow();  }
+		if (EH===false)
+			throw new Error("Can not remove unknown event: \nElement: "+element+" id: "+element.id+"\neventType: "+eventType+" useCapture: "+useCapture+"\n"+handler);  }
+	EH.remove();  }
 UniDOM.removeEventHandler.apply=applyToElement;  // (element, Array→[eventType, handler, useCapture])
 UniDOM.removeEventHandler._apply_=Function.prototype.apply;
 
 
 	//private
 	function cleanWindow(w)  {
+		if (eventedWindows.length===0)  return;
 		for (var i in eventedWindows)  {if (w===eventedWindows[i].window)  break;}
 		for (var id in eventedWindows[i].allEvents)  {return false;}    //if there are any EventHandlers still registered in this window, we can’t yet clean it.
-		delete eventedWindows[i];
+		eventedWindows.splice(i, 1);
 		if (w.removeEventListener)  w.removeEventListener('unload', UniDOM.removeAllEventHandlers, false);
 		else
 		if (w.detachEvent)  w.detachEvent('onunload', UniDOM.removeAllEventHandlers);  }
 
 
 // registered to a window or element, or is a property of an element, so “this” is the window or element…
-UniDOM.removeAllEventHandlers=function(element)  {
-	element=xElement(element);
-	if (this===UniDOM  &&  !element)  throw new Error('UniDOM.removeAllEventHandlers is a method of a DOM Element or window, or must be supplied an element or window as an argument.');
-	if (!element)  element=this;
-	getAllEventsInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView, false);
-	if (element.parentWindow)   // DOM element passed in
-		for (var id in allEvents)  {if (allEvents[id].element===element)  UniDOM.removeEventHandler(allEvents[id]);}
+UniDOM.removeAllEventHandlers=function(element, goDeep)  {
+	if (UniDOM.isWindow(this))  element=this;
+	else  element=xElement(element||this);
+	if (!UniDOM.isElementNode(element)  &&  !UniDOM.isWindow(element))  {
+		throw new Error('UniDOM.removeAllEventHandlers is a method of a DOM Element or window, or must be supplied an element or window as an argument.');  }
+	var d=element.ownerDocument  ||  element.document  ||  element,
+			w=d.defaultView;
+	getAllEventsInWindow(w, false);
+	if (UniDOM.isElementNode(element))  { // DOM element passed in
+		remover(element);
+		if (goDeep)  UniDOM.getElements(element, remover, goDeep);  }
 	else   // a window passed in
-		for (var id in allEvents)  {UniDOM.removeEventHandler(allEvents[id]);}
-	cleanWindow();  }
+		for (var id in allEvents)  {allEvents[id].remove();}
+	function remover(element)  {for (var id in allEvents)  {if (allEvents[id].element===element)  allEvents[id].remove();}}  }
+UniDOM.removeAllEventHandlers.apply=applyToElement;  // (element, Array→[eventType, handler, useCapture])
+UniDOM.removeAllEventHandlers._apply_=Function.prototype.apply;
+
 
 
 //For MSIE9 both event paradigms may be triggered if UniDOM.addEventHandler.retroMSIE9=null
-//   only old-MSIE ‖or‖ Standards may be triggered if retroMSIE9=Boolean(true‖false)
-UniDOM.generateEvent=function(element, eventType, eSpecs)  {  var i, p, eT, event;
+//  only old-MSIE ‖or‖ Standards may be triggered if UniDOM.addEventHandler.retroMSIE9=Boolean(true‖false)
+UniDOM.generateEvent=function(element, eventType, eSpecs)  {  var i, j, p, d, eT, event;
 	element=xElement(element);
 	if (typeof eSpecs !== 'object')  eSpecs=new Object;
 	eventType=arrayify(eventType);
 	for (i=0; i<eventType.length; i++)  {
 		eT=getEventType(eventType[i]);
 		if (document.createEvent  &&  (MS_exploder!==9  ||  UniDOM.addEventHandler.retroMSIE9!==true))  {
-			var subT=eT.match( /mouse|click|key|./ );
-			switch (subT[0])  {
+			var subT=eT.match( /wheel|mouse|click|key|focus|dom|resize|scroll|./ );
+			switch (eSpecs && eSpecs.view && subT[0])  {
+				case 'wheel':
+					if (typeof WheelEvent === 'function')  {event=new WheelEvent(eT, eSpecs);  break;}
 				case 'mouse':
-				case 'click': event=document.createEvent('MouseEvent');  break;
-				case 'key':   event=document.createEvent('UIEvent');  break;
-				default:      event=document.createEvent('Event');  break;  }
-			event.initEvent(eT, eSpecs.canBubble, eSpecs.cancelable,  // all Events
-				eSpecs.view, eSpecs.detail,   // UIEvents (includes key events and mouse events)
-				eSpecs.screenX, eSpecs.screenY, eSpecs.clientX, eSpecs.clientY,  // MouseEvents
-				eSpecs.ctrlKey, eSpecs.altKey, eSpecs.shiftKey, eSpecs.metaKey,  // MouseEvents
-				eSpecs.button, eSpecs.relatedTarget);                            // MouseEvents
+				case 'click':
+					if (typeof MouseEvent === 'function')  event=new MouseEvent(eT, eSpecs); //allow newer properties when possible
+					else  { event=document.createEvent('MouseEvent');
+						event.initMouseEvent(eT, eSpecs.canBubble, eSpecs.cancelable,
+							eSpecs.view, eSpecs.detail,
+							eSpecs.screenX, eSpecs.screenY, eSpecs.clientX, eSpecs.clientY,
+							eSpecs.ctrlKey, eSpecs.altKey, eSpecs.shiftKey, eSpecs.metaKey,
+							eSpecs.button, eSpecs.relatedTarget);  }
+				break;
+				case 'key':
+					if (typeof KeyboardEvent === 'function')  {event=new KeyboardEvent(eT, eSpecs);  break;}
+				case 'focus':
+					if (subT[0]==='focus'  &&  typeof FocusEvent === 'function')  {event=new FocusEvent(eT, eSpecs);  break;}
+				case 'touch':
+					if (subT[0]==='touch'  &&  typeof TouchEvent === 'function')  {event=new TouchEvent(eT, eSpecs);  break;}
+				case 'resize':
+				case 'scroll':
+					if (typeof UIEvent === 'function')  event=new UIEvent(eT, eSpecs);
+					else  { event=document.createEvent('UIEvent');
+						event.initUIEvent(eT, eSpecs.canBubble, eSpecs.cancelable,
+							eSpecs.view, eSpecs.detail);  } //it is unclear what “detail” has to do with the keyboard, or how to set a key value except maybe through the eSpecs.userArgs
+				break;
+				default:  //Mouse & UI Events without user-defined eSpecs “should” auto-generate appropriate real-time values
+					if (eSpecs  &&  eSpecs.detail  &&  typeof CustomEvent === 'function')  event=new CustomEvent(eT, eSpecs);
+					else
+					if (typeof Event === 'function')  event=new Event(eT, eSpecs);
+					else  { event=document.createEvent('Event');
+						event.initEvent(eT, eSpecs.canBubble, eSpecs.cancelable);  }  }
+			//for (p in eSpecs)  {if (event[p] === undefined  &&  !event.hasOwnProperty(p))  event[p]=eSpecs[p];}
 			if (eSpecs.userArgs)  for (p in eSpecs.userArgs)  {event[p]=eSpecs.userArgs[p];}
 			element.dispatchEvent(event);  }
 		if (document.createEventObject  &&  (MS_exploder!==9  ||  UniDOM.addEventHandler.retroMSIE9!==false))  {  //old MSIE
-			event=document.createEventObject();  event.type=eT;
+			event=document.createEventObject();  event.type=eT;  event.canBubble=eSpecs.canBubble;
 			if (eSpecs.userArgs)  for (p in eSpecs.userArgs)  {event[p]=eSpecs.userArgs[p];}
-			try {element.fireEvent('on'+eT, event);}   //old I.E. will choke on user-defined event types
-			catch(err) {console.log('event type: '+eT+'\n'+err);}  }  }  }
+			if (legacyEvents[eT])  element.fireEvent('on'+eT, event);
+			else  {  //old I.E. will choke on user-defined or modern event types
+				d=element.ownerDocument  ||  element.document  ||  element;
+				getCustomEventsInWindow(d.defaultView);
+				for (j=customEvents.length; --j>=0;)  {
+					if (customEvents[j].eventType===eT  &&  customEvents[j].element===element)
+						customEvents[j].wrapper(event);  }  }  }  }  }
 UniDOM.generateEvent.apply=applyToElement;  // (element, Array→[eventType, eSpecs])
 UniDOM.generateEvent._apply_=Function.prototype.apply;
 
@@ -436,6 +532,14 @@ UniDOM.getElementOffset=function(element, scroll)  {
 	return {x:x, y:y, fixed:fixed};  }
 
 
+UniDOM.isElementNode=(MS_exploder  &&  MS_exploder<9) ?
+	function(e)  {return  typeof e == 'object'  &&  (e instanceof Element  ||  e.nodeType===Node.ELEMENT_NODE);}  //dumb-down the test for Microsoft to pass
+: function(e)  {return  typeof e == 'object'  &&  (e instanceof Element  ||  (e instanceof Node  &&  e.nodeType===Node.ELEMENT_NODE));};
+
+UniDOM.isWindow=(Window  &&  (window instanceof Window)) ?
+	function(e)  {return  e instanceof Window;}
+: function(e)  {return  typeof e == 'object'  &&  ((e=e.toString()) && e.match( /wIndOw/i ));};
+
 
 UniDOM.addEventHandler(window, 'onload', function()  {  // crusty old fossil crutches
 
@@ -482,11 +586,6 @@ if (document.body.scrollWidth)  { // console.log('using dinosaur MSIE without a 
  *
  *
  */
-
-UniDOM.isElementNode=(MS_exploder  &&  MS_exploder<9) ?
-	function(e)  {return (typeof e == 'object'  &&  (e instanceof Element  ||  e.nodeType===Node.ELEMENT_NODE));}  //dumb-down the test for Microsoft to pass
-: function(e)  {return (typeof e == 'object'  &&  (e instanceof Element  ||  (e instanceof Node  &&  e.nodeType===Node.ELEMENT_NODE)));};
-
 
 
 // If no match is found, false is returned.
@@ -586,7 +685,7 @@ UniDOM.isElementNode=(MS_exploder  &&  MS_exploder<9) ?
 // returns (e) if the element (e) is an ancestor/descendant of this-Element.
 // else returns false.
 	function hasAncestor(e)  {return getAncestor.call(this, function(a) {return (a===e)})}
-	function hasElement(e)  {ta=this;  return  getAncestor.call(e, function(a) {return (a===ta)})  ?  e : false;}
+	function hasElement(e)  {ta=this;  return  (UniDOM.isElementNode(e)  &&  getAncestor.call(e, function(a) {return (a===ta)}))  ?  e : false;}
 
 
 	function getElementsByName(n, deep, objFltr, applyDirect, powerSelect)  {
@@ -630,7 +729,7 @@ UniDOM.isElementNode=(MS_exploder  &&  MS_exploder<9) ?
 	//data is a random-length array of a user-defined set of “conditions” to be met
 	//data members that have a “logic” property should be Arrays that are considered a sub-set of conditions
 	// ¡ NOTE how NOT≡NOR but XNOT≠XNOR !
-	function has(data, filter)  { // filter-function returns true if “condition” is met, false if not
+	function has(data, filter)  { // filter-function should return true if each data “condition” is met, false if not
 		var logic= data.logic || 'and',   // data.logic should be either:  'and'  'or'  'nor'  'not'  'nand'  'xor'  'xnor'  'xnot'
 				xFlag=false, i, c=0;
 		if (logic==='nor')  logic='not'
@@ -768,7 +867,7 @@ UniDOM.ElementWrapper.prototype.$=function(CSSString, objFltr, applyDirect, powe
 
 UniDOM.ElementWrapper.prototype.addEventHandler=function()  {return UniDOM.addEventHandler.apply(this.element, arguments);};
 UniDOM.ElementWrapper.prototype.removeEventHandler=function()  {UniDOM.removeEventHandler.apply(this.element, arguments);  return this;};
-UniDOM.ElementWrapper.prototype.removeAllEventHandlers=function()  {UniDOM.removeAllEventHandlers(this.element);  return this;};
+UniDOM.ElementWrapper.prototype.removeAllEventHandlers=function(goDeep)  {UniDOM.removeAllEventHandlers(this.element, goDeep);  return this;};
 UniDOM.ElementWrapper.prototype.generateEvent=function()  {UniDOM.generateEvent.apply(this.element, arguments);  return this;};
 UniDOM.ElementWrapper.prototype.triggerEvent=function(event)  {UniDOM.triggerEvent(this.element, event);  return this;};
 
@@ -868,10 +967,10 @@ UniDOM.ElementWrapperArray.dfltMethods.prototype.useClass=function() {cb=useClas
 UniDOM.ElementWrapperArray.dfltMethods.prototype.swapOutClass=function() {cb=swapOutClass;  return applyToAll.apply(this, arguments);};
 UniDOM.ElementWrapperArray.dfltMethods.prototype.disable=function() {cb=disable; return applyToAll.apply(this, arguments);};
 
-UniDOM.ElementWrapperArray.dfltMethods.prototype.addEventHandler=function() {cb=UniDOM.addEventHandler;  return invokeAll.apply(this, arguments);};
-UniDOM.ElementWrapperArray.dfltMethods.prototype.removeEventHandler=function() {cb=UniDOM.removeEventHandler;  return invokeAll.apply(this, arguments);};
-UniDOM.ElementWrapperArray.dfltMethods.prototype.generateEvent=function() {cb=UniDOM.generateEvent;  return invokeAll.apply(this, arguments);};
-UniDOM.ElementWrapperArray.dfltMethods.prototype.triggerEvent=function() {cb=UniDOM.triggerEvent;  return invokeAll.apply(this, arguments);};
+UniDOM.ElementWrapperArray.dfltMethods.prototype.addEventHandler=function() {cb=UniDOM.addEventHandler;  return applyToAll.apply(this, arguments);};
+UniDOM.ElementWrapperArray.dfltMethods.prototype.removeEventHandler=function() {cb=UniDOM.removeEventHandler;  return applyToAll.apply(this, arguments);};
+UniDOM.ElementWrapperArray.dfltMethods.prototype.generateEvent=function() {cb=UniDOM.generateEvent;  return applyToAll.apply(this, arguments);};
+UniDOM.ElementWrapperArray.dfltMethods.prototype.triggerEvent=function() {cb=UniDOM.triggerEvent;  return applyToAll.apply(this, arguments);};
 
 UniDOM.ElementWrapperArray.dfltMethods.prototype.isElementNode=function() {cb=UniDOM.isElementNode;  return invokeAll.apply(this);};
 
@@ -923,12 +1022,13 @@ UniDOM.ElementWrapperArray.dfltMethods.prototype.filter=function(cb, o)  {
 		for (var i=0, r=new Array, EWA=getEWA(this);  i<EWA.length;  i++)  {r[i]=cb.apply(xElement(EWA[i]), arguments);}
 		return r;  }
 	function invokeAll()  {
-		for (var i=0, EWA=getEWA(this);  i<EWA.length;  i++)  {
-			r=r.concat(cb.apply(UniDOM, Array.prototype.slice.call(arguments, 0).unshift(xElement(EWA[i]))));  }
+		for (var args, i=0, r=new Array, EWA=getEWA(this);  i<EWA.length;  i++)  {
+			args=Array.prototype.slice.call(arguments, 0);  args.unshift(xElement(EWA[i]));
+			r=r.concat(cb.apply(UniDOM, args));  }
 		return r;  }
 	function asArray(a, asArray) {return asArray ? a : (a.length<1 ? null : ((asArray===false && a.length<2) ? a[0] : a));}
 
-	function xElement(e) {return (!e.toString().match( /wIndOw/i )  &&  (e instanceof UniDOM.ElementWrapper)) ? e.element : e;}
+	function xElement(e) {return (!UniDOM.isWindow(e)  &&  (e instanceof UniDOM.ElementWrapper)) ? e.element : e;}
 	function getEWA(o)  {
 		if (o instanceof UniDOM.ElementWrapperArray.dfltMethods)  o=o.EWA;
 		if (o instanceof Array)
@@ -962,7 +1062,7 @@ UniDOM.ElementWrapperArray.dfltMethods.prototype.filter=function(cb, o)  {
 		if (typeof filter !== 'function')  filter=function() {};
 		for (var n, e, i=0;  i<a.length;  i++)  {
 			e=xElement(a[i]);
-			if (e.nodeName==='SELECT' && (powerSelect || UniDOM.powerSelect))  {e.getSelected=getSelectedOptions;  e.setSelected=setSelected;}
+			if (e.nodeName==='SELECT' && (powerSelect || (UniDOM.powerSelect && powerSelect!==false)))  {e.getSelected=getSelectedOptions;  e.setSelected=setSelected;}
 			if (!(n=filter(e)))  continue;  //get a property name corresponding to this array member
 			if (a[n]  &&  !(a[n] instanceof Array))  a[n]=new UniDOM.ElementWrapperArray(Boolean(a.wrappedElements), applyDirect, a[n]);
 			if (a[n] instanceof Array)  a[n].push(e);  else  a[n]=e;  }  };
@@ -1005,6 +1105,12 @@ UniDOM.globalize=function(myWindow)  { //hog the space
 
 UniDOM.prototypify=function()  { //invade the DOM
 
+	if (CSSEngine)
+	Element.prototype.$=function(CSSString, objFltr, applyDirect, powerSelect)  {
+		var EWA=new UniDOM.ElementWrapperArray(CSSEngine.call(this, CSSString), false, applyDirect);
+		if (EWA.length && (objFltr || powerSelect || UniDOM.powerSelect))  objectify(EWA, objFltr, applyDirect, powerSelect);
+		return EWA;  }
+
 	Element.prototype.getAncestor=getAncestor;
 	Element.prototype.getElements=getElements;
 	Element.prototype.getElders=getElders;
@@ -1030,7 +1136,7 @@ UniDOM.prototypify=function()  { //invade the DOM
 
 	Element.prototype.addEventHandler=function() {UniDOM.addEventHandler.apply(this, arguments);};
 	Element.prototype.removeEventHandler=function() {UniDOM.removeEventHandler.apply(this, arguments);};
-	Element.prototype.removeAllEventHandlers=function() {UniDOM.removeAllEventHandlers(this);};
+	Element.prototype.removeAllEventHandlers=function(goDeep) {UniDOM.removeAllEventHandlers(this, goDeep);};
 	Element.prototype.getEventHandler=function() {UniDOM.getEventHandler.apply(this, arguments);};
 	Element.prototype.generateEvent=function() {UniDOM.generateEvent.apply(this, arguments);};
 
@@ -1038,12 +1144,6 @@ UniDOM.prototypify=function()  { //invade the DOM
 	Element.prototype.getOffset=function(scroll)  {return UniDOM.getElementOffset(this, scroll);};
 	Element.prototype.getMouseOffset=function(event)  {return UniDOM.getMouseOffset(this, event);};  }
 
-
-//****this aspect is depreciated for now but may be re-instated in the future if another “UniDOM” codeset surfaces
-//  UniDOM is made global for your access convenience; however, if this causes problems:
-//  All of Softmoon-WebWare’s code references the UniDOM Object using  with (SoftMoon.WebWare) {}  therefore
-//  UniDOM may be referenced globally or as a property of SoftMoon.WebWare:
-//SoftMoon.WebWare.UniDOM=UniDOM;
 
 window.UniDOM=UniDOM;
 
