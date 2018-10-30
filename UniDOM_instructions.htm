@@ -1,0 +1,2622 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name='description' content='UniDOM: Write ONE script codeset for ONE DOM on all browsers - INCLUDING captured events like drag-and-drop!' />
+<meta name='keywords' content='cross-browser javascript' />
+<meta name='author' content='Joe Golembieski, SoftMoon-WebWare' />
+<meta name='copyright' content='Copyright © 2013, 2014 Joe Golembieski, SoftMoon-WebWare' />
+<title>UniDOM Instructions from SoftMoon WebWare</title>
+<style type="text/css">
+body, section, header, footer, div, h1, h2, h4, h5, img, ul, ol, dl, menu, li {
+	margin: 0;
+	padding: 0; }
+mark {
+	background-color: inherit; }
+body {
+	min-width: 800px;
+	font-family: Times, "Times New Roman", serif;
+	color: #000000;
+	background: #FFDEAD url(images/SoftMoon.repeat-y.png) repeat-y; }
+
+#top {
+	position: relative;
+	height: 700px;
+	min-height: 42em;
+	background: #FFDEAD url(images/SoftMoon.repeat-x.png) repeat-x; }
+#top, .content, footer {
+	min-width: 62em;
+	opacity: .62;
+	-moz-opacity: .62;
+	filter: alpha(opacity=62); }
+#top h1:first-child {
+	font-size: 1.618em;
+	font-weight: bold;
+	font-family: "Cooper Black", serif;
+	padding: .618em 0 0 1em; }
+#top h1 span {
+	padding: 0 0 0 2.618em;
+	font-size: .764em }  /* ≈ Φ + ((1-Φ) - (1-Φ)*Φ) */
+#top h1:last-child {
+	position: absolute;
+	bottom: 17px;
+	left: 0px;
+	text-align: center;
+	width: 100%; }
+#top figure {
+	position: absolute;
+	top: 2.618em;
+	left: 1em; }
+#logo {
+	font-size: 1.618em; /*for alt text*/
+	font-weight: bold;
+	line-height: 150%; }
+#top figcaption {
+	font-size: 1.382em;
+	font-weight: bold;
+	text-align: center;
+	width: 27em; }
+#top h1 span,
+#top figcaption span {
+	display: block;
+	font-style: oblique; }
+#top figcaption span em {
+	text-transform: uppercase;
+	font-weight: bold }
+
+nav,
+aside {
+	position: absolute;
+	right: .618em;
+	left: auto;
+	width: 9.618em;
+	z-index: 62;
+	text-align: center;
+	font-size: 1.162em; }
+aside {
+	left: .618em;
+	right: auto; }
+nav menu {
+	list-style-type: none;
+	text-align: right;
+	margin-left: -7em; }
+nav menu li {
+	position: relative;
+	width: 16.618em;
+	overflow: hidden; }
+nav li a {
+	width: 9.618em;
+	display: inline-block; }
+nav menu li:hover {
+	overflow: show; }
+nav li a:hover {
+	width: auto;
+	padding-left: .382em;
+	background-color: white; }
+
+.content {
+	position: relative;
+	width: 100%;	/* fix MS and IE: crash 'n' trash	(yet another "hasLayout" bug?) */
+	background: #FFDEAD;
+	text-align: center;
+	z-index: 1; }
+
+.content code,
+.content a,
+.word,
+.content p span,
+.content td span,
+.content dd span {
+	white-space: nowrap; }
+.content code {
+	color: #803020; }
+span.userArgs,
+code.userArgs {
+	color: #203080; }
+.optArgs,
+.userArgs {
+	background-color: LemonChiffon; }
+.content p code,
+.content code {
+	display: inline-block;
+	text-align: left; }
+.content p a code,
+.content dl a code {
+	text-decoration: underline; }
+.content > code,
+.content p code.example,
+.content code.example {
+	display: block;
+	white-space: pre;
+	font-size: 1.236em;
+	margin: 0 11.618em; }
+.content h4 > code {
+	display: block; }
+.content h4 .comment {
+	display: block;
+	font-size: .764em; }
+.content > p + code,
+.method > p + code {
+	margin-top: -1em;
+	padding-bottom: 1em; }
+.content > p + code.follwedUp {
+	margin-bottom: 0; }
+ul code.example,
+div.returnValue code.example,
+div.properties code.example {
+	margin: .618em; }
+
+.content > p,
+.content dl,
+div.returnValue > p,
+.method p,
+.instance p,
+.property p,
+table.jsObject {
+	text-align: justify;
+	font-size: 1.236em;
+	width: 27em;
+	margin: 0 auto 0 auto;
+	padding: 0 1em 1em 1em; }
+.content > p,
+.content dd,
+div.returnValue > p,
+.method p,
+.instance p,
+.property p {
+	text-indent: -.618em; }
+.content > p *,
+.content dd *,
+div.returnValue > p *,
+.method p *,
+.instance p *,
+.property p * {
+	text-indent: 0; }
+.content > p:first-letter,
+div.returnValue > p:first-letter,
+.method p:first-letter,
+.instance p:first-letter,
+.property p:first-letter {
+	font-size: 1.618em;
+	font-weight: bold;
+	color: #000040; }
+.content dt {
+	margin-left: -2.618em;
+	padding: .162em .382em;
+	display: inline-block; }
+.content dd {
+	margin: 0;
+	padding: 0; }
+.content dd ul {
+	padding-left: .618em; }
+.content dd code.example {
+	margin: 0 0 0 -7.618em; }
+.content .properties dd code.example,
+.content .properties dd p {
+	margin: 0;
+	padding: 0;
+	font-size: inherit; }
+.content dd table,
+table.jsObject {
+	margin-bottom: 1.382em;
+	width: 38.2em; }
+.content dd table {
+	margin-left: -4.618em; }
+table.jsObject caption {
+	text-align: center; }
+table.jsObject th {
+	text-align: center;
+	padding: 0 .382em;
+	vertical-align: bottom; }
+.content dd table td,
+table.jsObject td {
+	text-align: center;
+	white-space: nowrap;
+	padding: 0 .382em;
+	vertical-align: top; }
+.content dd table td:first-child,
+table.jsObject td:first-child  {
+	text-align: right; }
+.content dd table td:last-child,
+table.jsObject td:last-child  {
+	text-align: left;
+	white-space: normal; }
+table#hybrid_event,
+table.jsObject  {
+	margin-top: 1em; }
+table#hybrid_event caption,
+table#hybrid_event tfoot td {
+	text-align: left;
+	padding-left: 2.618em; }
+#EventHandler table tr:last-child td:last-child {
+	padding-bottom: 8.618em; }
+#EventHandler table code.example {
+	margin: 0;
+	position: absolute; }
+#generateEvent dd table {
+	border-collapse: collapse; }
+#generateEvent dd table td,
+#generateEvent dd table th {
+	border: 1px solid; }
+#generateEvent dd table td:first-child,
+#generateEvent dd table code,
+#generateEvent dd table th {
+	white-space: normal;
+	text-align: left; }
+
+
+
+.content > ul {
+	list-style-type: disk;
+	width: 38.2em;
+	margin: 0 auto;
+	font-size: 1.236em;
+	text-align: left; }
+.content > ul.examples {
+	width: auto;
+	margin: 0 11.618em; }
+
+.content > ul > li {
+	margin-bottom: .618em; }
+.content > ul ul {
+/*	display: inline-block;*/
+	list-style-type: circle;
+	list-style-position: outside;
+	margin-left: 1.618em;
+	max-width: 37em;
+	text-align: left; }
+
+.content > h3 {
+	font-size: 2em;
+	text-align: left;
+	padding-left: .618em; }
+.content > div > h4 {
+	font-size: 1.618em;
+	display: inline-block;
+	padding: .618em;
+	margin-bottom: .382em; }
+.content > div + hr {
+	width: 61.8%;
+	margin: 4.618em auto; }
+.content > div > h4,
+.content dt,
+.content dt .note span,
+div.returnValue,
+div.properties,
+.instance div.static.properties {
+	background-color: PowderBlue;
+	border: 4px double DeepSkyBlue;
+	border-radius: .618em; }
+.instance div.properties,
+.content > div.instance > h4 {
+	border: 4px double DarkMagenta; }
+.instance div.method.properties {
+	border: 4px double OrangeRed; }
+.content .functional {
+	background-color: LemonChiffon; }
+.content h4 .functional {
+	outline: 1px solid DarkMagenta; }
+.content dt.functional {
+	border: 4px double DarkMagenta; }
+.content dt .note {
+	position: relative;
+	background-color: inherit; }
+.content dt .note span {
+	display: none;
+	position: absolute;
+	top: 0;
+	left: .618em;
+	width: 4.618em;
+	padding: .382em;
+	padding-top: .162em;
+	background-color: inherit;
+	font-size: .7em; }
+.content dt:hover .note span {
+	display: block; }
+div.returnValue,
+div.properties {
+	display: inline-block;
+	margin: 1em auto;
+	background-color: Lavender; }
+div.properties,
+.instance div.static.properties {
+	background-color: PaleGreen; }
+div.returnValue h5,
+div.properties h5 {
+	font-size: 1.618em;
+	text-align: left;
+	padding-left: 1em; }
+h6 {
+	font-size: 1.162em; }
+div.properties dl {
+	width: auto; }
+div.properties dt {
+	margin: .618em 0 0 2.162em; }
+div.method.properties ul {
+	width: auto;
+	list-style-type: none;
+	margin: 0 .618em 1.618em;
+	font-family: monospace;
+	font-size: 1.382em;
+	column-count: 2;
+	column-gap: 1.618em;
+	column-rule: 4px double;
+	-webkit-column-count: 2;
+	-webkit-column-gap: 1.618em;
+	-webkit-column-rule: 4px double;
+	-moz-column-count: 2;
+	-moz-column-gap: 1.618em;
+	-moz-column-rule: 4px double;
+	 }
+
+
+footer {
+	position: relative;
+	height: 100px;
+	background: #FFDEAD url(images/SoftMoon.footer.back.png) repeat-x bottom; }
+footer p {
+	position: absolute;
+	left: 1.618em;
+	bottom: .618em;
+	font-size: .78em;
+	font-weight: bold; }
+footer .notice {
+	white-space: nowrap;
+	margin-right: 7.618em; }
+.numerance {
+	font-size: .618em;
+	vertical-align: .618em;
+	line-height: 100%; }
+.macronym {
+	display: inline;
+	font-size: .763924em;
+	vertical-align: .236076em;
+	line-height: 100%; }
+acronym.macronym {
+	font-size: .382em;
+	vertical-align: 1.1618em;
+	border-bottom: none; }
+code {
+	font-family: "consolas", "monospace"; }
+code.filename,
+code .filename {
+	color: #0066FF; }
+.attention {color: red;}
+big {
+	font-size: 1.382em;
+	line-height: .618em; }
+strong em {
+	text-transform: uppercase; }
+.grayNote {
+	opacity: .47; }
+content dd span.grayNote {
+	white-space: nomal; }
+</style>
+</head>
+<body>
+<header id='top'>
+<h1>Custom Web Software Development for the 21<mark class='numerance'>st</mark> Century<acronym class='macronym' title="service mark">SM</acronym></h1>
+<figure>
+<img id='logo' src="images/SoftMoon.gif" alt="SoftMoon WebWare" />
+<figcaption><acronym>PHP</acronym>, <acronym>SQL</acronym>s, JavaScript<mark class='macronym'>™</mark>, <acronym>Ajax</acronym>, <acronym>HTML5</acronym>, <acronym>XHTML</acronym>, &amp; <acronym>CSS3</acronym>:
+<span>Innovative Enterprise level Scripting for interactive sites, <acronym title='software as a service'>SaaS</acronym>, &amp; cross-platform desktop apps</span></figcaption>
+</figure>
+<h1>UniDOM.js<mark class='macronym'>™</mark>
+<span>Write <strong><em>one</em></strong> JavaScript<mark class='macronym'>™</mark> codeset for
+<strong><em>one</em></strong> <acronym title='Document-Object Model'>DOM</acronym> on all browsers</span></h1>
+</header>
+
+<section id='content' class='content'>
+
+<nav>
+<h3>UniDOM functions/methods &amp; Constructors:</h3>
+<h4>Event handling</h4>
+<menu>
+<li><a href="#addEventHandler">addEventHandler</a></li>
+<li><a href="#EventHandler">EventHandler</a></li>
+<li><a href="#removeEventHandler">removeEventHandler</a></li>
+<li><a href="#getEventHandler">getEventHandler</a></li>
+<li><a href="#removeAllEventHandlers">removeAllEventHandlers</a></li>
+<li><a href="#generateEvent">generateEvent</a></li>
+<li><a href="#triggerEvent">triggerEvent</a></li>
+<li><a href="#getMouseOffset">setMouseEventOffsets</a></li>
+<li><a href="#getMouseOffset">getMouseOffset</a></li>
+<li><a href="#enable_oldMSIE">enable_oldMSIE_capture</a></li>
+</menu>
+<h4>Client info</h4>
+<menu>
+<li><a href="#getScreenXY">getScreenX</a></li>
+<li><a href="#getScreenXY">getScreenY</a></li>
+<li><a href="#getInnerWH">getInnerWidth</a></li>
+<li><a href="#getInnerWH">getInnerHeight</a></li>
+<li><a href="#getScrollXY">getScrollX</a></li>
+<li><a href="#getScrollXY">getScrollY</a></li>
+<li><a href="#getDocumentWH">getDocumentWidth</a></li>
+<li><a href="#getDocumentWH">getDocumentHeight</a></li>
+</menu>
+<h4><acronym title='Document-Object Model'>DOM</acronym> query &amp; manipulation tools</h4>
+<menu>
+<li><a href="#getElementOffset">getElementOffset</a></li>
+<li><a href="#isElementNode">isElementNode</a></li>
+<li><a href="#getAncestor">getAncestor</a></li>
+<li><a href="#getElements">getElements</a></li>
+<li><a href="#getAncestor">getJuniors</a></li>
+<li><a href="#getElements">getElders</a></li>
+<li><a href="#hasAncestor">hasAncestor</a></li>
+<li><a href="#hasElement">hasElement</a></li>
+<li><a href="#getElementsByName">getElementsByName</a></li>
+<li><a href="#getAncestorByClass">getAncestorByClass</a></li>
+<li><a href="#getElementsByClass">getElementsByClass</a></li>
+<li><a href="#getAncestorByComplex">getAncestorByComplex</a></li>
+<li><a href="#getElementsByComplex">getElementsByComplex</a></li>
+<li><a href="#hasClass">hasClass</a></li>
+<li><a href="#addClass">addClass</a></li>
+<li><a href="#removeClass">removeClass</a></li>
+<li><a href="#useClass">useClass</a></li>
+<li><a href="#swapOutClass">swapOutClass</a></li>
+<li><a href="#disable">disable</a></li>
+</menu>
+<h4>JavaScript<mark class='macronym'>™</mark> power tools</h4>
+<menu>
+<li><a href="#has">has</a></li>
+</menu>
+<h4>Utilizing your results</h4>
+<menu>
+<li><a href="#objectify">objectify</a></li>
+<li><a href="#powerSelect">getSelected</a></li>
+<li><a href="#powerSelect">setSelected</a></li>
+<li><a href="#powerSelect">getSelectedOptions</a></li>
+<li><a href="#powerSelect">setSelectedOptions</a></li>
+<li><a href="#powerSelect">addPowerSelect</a></li>
+</menu>
+<h4>UniDOM’s Element Wrappers</h4>
+<menu>
+<li><a href="#ElementWrapper">ElementWrapper</a></li>
+<li><a href="#ElementWrapperArray">ElementWrapperArray</a></li>
+</menu>
+<h4><acronym title='Cascading Style Sheet'>CSS</acronym> selector engine:</h4>
+<menu>
+<li><a href='#UniDOM'>UniDOM()</a></li>
+<li><a href='#CSSEngine'>$()</a></li>
+</menu>
+<h4>UniDOM’s environment</h4>
+<menu>
+<li><a href="#globalize">globalize</a></li>
+<li><a href="#prototypify">prototypify</a></li>
+</menu>
+<h3>common arguments</h3>
+<menu>
+<li><a href="#objectify">objFltr</a></li>
+<li><a href="#ElementWrapperArray">applyDirect</a></li>
+<li><a href="#powerSelect">powerSelect</a></li>
+</menu>
+<h3>UniDOM flags and references</h3>
+<menu>
+<li><a href="#CSSEngine">UniDOM.CSSEngine</a></li>
+<li><a href="#addEH_properties">addEventHandler.errorOnDoubleBind</a></li>
+<li><a href="#addEH_properties">addEventHandler.retroMSIE9</a></li>
+<li><a href="#ElementWrapperArray">ElementWrapperArray.wrappedElements</a></li>
+<li><a href="#ElementWrapperArray">ElementWrapperArray.applyDirect</a></li>
+<li><a href="#powerSelect_properties">UniDOM.powerSelect</a></li>
+<li><a href="#MS_Exploder">UniDOM.MS_exploder</a></li>
+</menu>
+<h3>Auxiliaries:</h3>
+<menu>
+<li><a href="#getComputedStyle">window.getComputedStyle</a></li>
+<li><a href="#objectify">objectifyArray</a></li>
+<li><a href="#has">objHas</a></li>
+<li><a href="#has">Object.has</a></li>
+</menu>
+</nav>
+
+<aside>
+<p>download our
+<a href='http://softmoon-webware.com/OpenSource.php'>JavaScript<mark class='macronym'>™</mark> UniDOM</a> package.
+</p>
+</aside>
+
+
+<p>I’ve heard it said (or something similar by Manual Lemos and one of his guests in a podcast on
+<a href='http://jsclasses.org/blog/'>JSClasses.org</a>)
+<q cite='http://jsclasses.org/blog/'>There are JavaScript<mark class='macronym'>™</mark> programmers and there are
+<a href='http://jquery.com'>jQuery</a> programmers, and one person is usually not both.</q>&nbsp;
+I say there are three different types of people developing websites: software-engineers, programmers, and code-monkeys.&nbsp;
+The code-monkeys really have no personal interest in writing code, other than it’s their job.&nbsp;
+They may be graphic artists, or maybe the advertising/social-networking professional for a business,
+or maybe just a teen building his/her own website for a band he/she plays in;
+whatever their motivation, they need dynamic and/or interactive <acronym>HTML</acronym> pages,
+and jQuery is a fantastic tool to help them create their vision without having to know (and almost daily keep up with)
+the many details regarding how to leverage the power of different browsers across different platforms,
+or worry about creating logic patterns that work without crashing or exposing vulnerabilities.&nbsp;
+In other words, programming is not for everyone, but some web-developers still need to utilize scripting power.</p>
+
+<p>Real programmers may go either way, and possibly even both:
+learning how to write code in pure JavaScript<mark class='macronym'>™</mark> and/or
+learning how to leverage the power of one or more libraries like jQuery.&nbsp;
+They write more complex code, going beyond what the already-available libraries alone can accomplish.&nbsp;
+A true software engineer is a well-developed programmer who fully understands how to organize and structure
+a large set of code, and mold it into an application.&nbsp;
+A software engineer (should/hopefully) creates a code-base and supporting file-structure that maximizes efficiency
+by minimizing file-size and using streamlined code.&nbsp;
+Often it is found that common library files like jQuery do not have enough power in their functions,
+yet at the same time offer far more (and often redundant) functionality than is needed for the application being developed.&nbsp;
+For the applications I’ve been developing, this is the case.&nbsp;
+While I admire the “Sizzle” sub-component of jQuery
+(the part that allows you to query the <acronym title='Document-Object Model'>DOM</acronym>
+with <acronym>CSS</acronym>-like selectors), I generally find the greater jQuery package bloated and underpowered.&nbsp;
+So I developed the UniDOM project.<p>
+
+
+<p>There are two basic parts to the UniDOM code-base.&nbsp;
+The first handles <acronym title='Document-Object Model'>DOM</acronym> “events,”
+and the second is a collection of methods for querying and working with the
+<acronym title='Document-Object Model'>DOM</acronym>.&nbsp;
+And as promised in the headlines, UniDOM‘s <a href='#addEventHandler'><code>addEventHandler()</code></a> method
+allows a programmer to write <strong>one</strong> script code-set for all browsers,
+<strong>¡including low-level event capturing!</strong>&nbsp;
+Yes, that is correct: you may now create custom drag-and-drop code, for example, and not worry about having to
+write code for modern browsers as well as separate code for legacy versions of Microsoft’s Internet Exploder.&nbsp;
+As a brief reminder, events are “captured” in the standard
+<acronym title='Document-Object Model'>DOM</acronym> by passing <code>true</code>
+as the final (3<abbr class='numerance'>rd</abbr>) argument to the standard <code>addEventListener()</code> method,
+whereas you must use the <code>setCapture()</code> method with Internet Exploder, and the two work very differently;
+so different that it is virtually, if not literally, impossible to write a “wrapper” method that can manage these
+two different approaches to “event capturing” on a low level.&nbsp;
+Sure you <strong>might</strong> be able to write a simple drag-and-drop interface that will work cross-browser with
+<acronym>HTML</acronym> elements in a very specific and limited way.&nbsp; I looked at that possibility and decided
+I didn’t even want to try.&nbsp;
+UniDOM avoids that mess and simply “simulates” the capturing phase, and then if captured,
+by necessity the “bubbling” phase.&nbsp;
+So you write your code as if it were for the standard
+<acronym title='Document-Object Model'>DOM</acronym>, and UniDOM does the rest!</p>
+
+<p>UniDOM’s <a href='#addEventHandler'><code>addEventHandler()</code></a> method also offers high-end programming
+features such as different coding styles (functional, plus two Object-Oriented styles),
+and the ability to pass to your event handler functions
+an <strong>unlimited</strong> number of user arguments that are true function <code>arguments</code>,
+not just artificially-added <span>“<code>Event</code> object”</span> properties.&nbsp;
+UniDOM’s “power methods” take <acronym title='Document-Object Model'>DOM</acronym> queries to the next level, can do far more,
+and are more flexible than most other popular JavaScript<mark class='macronym'>™</mark> libraries out there today.&nbsp;
+Yet UniDOM’s ultra-lightweight <strong>commented</strong> code-base is around 1∕4 of jQuery’s,
+and still even less than the <strong>minimized</strong> version of jQuery.&nbsp;
+Currently (autumn 2014) UniDOM <a href='https://developers.google.com/closure/compiler/'>minified and optimized </a>
+is 30KB versus jQuery minified at 94KB — less than 1∕3 the size!&nbsp;
+Taken together, all these features make UniDOM a formidable addition to any
+JavaScript<mark class='macronym'>™</mark> toolkit library.&nbsp;
+It’s true that jQuery has more features and is geared to more devices, operating systems, and browsers
+than UniDOM, but then not all projects are designed for a smartphone,
+or require auto-loading <acronym>HTML</acronym> subsections via “Ajax,” or animated pages, etc.&nbsp;
+UniDOM takes a more modular approach to script libraries, leaving “Ajax” and animation to other code files,
+giving programmers and software engineers a scripting library that is more flexible yet specialized to need,
+to create new projects without being stuck inside the box.&nbsp;
+UniDOM is not a replacement for jQuery, but it is also true that jQuery is not a replacement for UniDOM!&nbsp;
+Although the jQuery slogan is <q cite='http://jquery.com'>write less, do more,</q> as we will see,
+UniDOM can simplify scripting in ways that make the equivalent jQuery code seem like a short-story.</p>
+
+<p>The secret behind UniDOM’s “power-methods” for working with the <acronym title='Document-Object Model'>DOM</acronym> lies not only
+in their acceptance of regular expressions, whereas for example jQuery only accepts strings:</p>
+<code>// jQuery command:
+&nbsp; $('.myRedFlowers, .myGreenFlowers, .myPurpleFlowers, .myOrangeFlowers, .myBlueFlowers, .myYellowFlowers, .myCyanFlowers').removeClass('.myRedFlowers, .myGreenFlowers, .myPurpleFlowers, .myOrangeFlowers, .myBlueFlowers, .myYellowFlowers, .myCyanFlowers');
+// equivalent UniDOM command:
+&nbsp; UniDOM.getElementsByClass(document.body, /\bmy(Red|Green|Purple|Orange|Blue|Yellow|Cyan)Flowers\b/ )._.removeClass( /\bmy.+Flowers\b/ );
+// or maybe simply this UniDOM command:
+&nbsp; UniDOM.getElementsByClass(document.body, /\bmy.+Flowers\b/ )._.removeClass( /\bmy.+Flowers\b/ );</code>
+<p>UniDOM can also accept extremely complex “logic arrays,”
+whereas jQuery only allows simple “<code>and</code>/<code>or</code>” logic in query strings
+(the jQuery example above demonstrates logical “<code>or</code>”,
+and &nbsp;<code>$('.myPurpleFlowers.onBushes');</code>&nbsp; is an example of logical “<code>and</code>”).&nbsp;
+“Logic arrays” are explained below in the section describing the <a href='#has'><code>UniDOM.has()</code></a> method.&nbsp;
+Since UniDOM can also gather document elements using user-defined callbacks,
+a programmer can write code that gathers callback functions from various different modules and plug-ins,
+arrange them in complex “logic arrays” and perform a dynamically-created query.&nbsp;
+jQuery users are standing there with a blank look on their face… … …&nbsp;
+Oh, but wait, can’t a jQuery “selector string” do complex queries very simply that would be more complex for UniDOM?&nbsp;</p>
+
+<code class='folowedUp'>$('#myGuitars .sixString:selected');  //jQuery
+// vs. UniDOM without a <acronym title='Cascading Style Sheet'>CSS</acronym>-selector engine:
+UniDOM.getElementsbyClass(document.getElementById('myGuitars'), 'sixString')._.getSelected();
+</code>
+
+<p>No problem!&nbsp; Again, as we shall see, UniDOM can use various different selector engines, including the one
+that jQuery uses.</p>
+
+<p>	UniDOM is a lightweight hybrid of different approaches to cross-browser
+<acronym title='Document-Object Model'>DOM</acronym> compatibility and “power methods,”
+intended for use with applications to be inserted into larger projects,
+with a special focus on programmers’ tools with more flexibility and power,
+rather than myriads of shortcut methods for the less technically minded, many of which go unused;
+and with a focus on script readability and method names in the original spirit of JavaScript<mark class='macronym'>™</mark>
+that allow the uninitiated to follow along at least somewhat
+(especially if they know JavaScript<mark class='macronym'>™</mark> or another programming language)
+without having to guess or use a reference as to what each method is essentially trying to do,
+which allows you to write cross-application code that is more accessible to more people;
+and also with a focus on tools that allow developers to embrace the balance of:</p>
+
+<ul>
+	<li>minimal <acronym>HTML</acronym> Elements with minimal markup to the Elements:
+		<ul>
+			<li>no “wrapper” Elements that don’t directly reflect the document content itself,
+					simply for <acronym>CSS</acronym> or JavaScript<mark class='macronym'>™</mark> handles</li>
+			<li>minimize the use of classNames for example<br />
+					(meaning less Elements with any classNames, and less classNames per Element)</li>
+		</ul>
+		<strong>vs.</strong></li>
+	<li>simplified JavaScript<mark class='macronym'>™</mark> that relies as little
+			as possible on given <acronym>HTML</acronym> Elements
+			and document layout (¡more important!)</li>
+</ul>
+
+<h3 id='codeStyles'>UniDOM’s coding styles:</h3>
+
+<p>UniDOM offers 4 programming/coding styles, all possibly available at the same time.&nbsp;
+Note the first two functional styles commonly require “passing in” the
+<acronym title='Document-Object Model'>DOM</acronym> Element to work with,
+while the last two Object-oriented styles are methods of a
+<a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>, a
+<a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>,
+or a native <acronym title='Document-Object Model'>DOM</acronym> Element,
+so you don’t “pass in” an Element, and therefore the Object-oriented methods
+take one less argument (sans the first one) than the equivalent functional.</p>
+
+<ul class='examples'>
+	<li><h4>name-spaced functional programming style</h4>
+			<p>The first value passed in is always the element(s) used in the function.&nbsp;
+			Most functions take only one element passed in at a time.&nbsp;
+			“<code>addEventHandler</code>” is the exception.&nbsp;
+			Elements returned are “raw” (unwrapped) <acronym title='Document-Object Model'>DOM</acronym> Elements
+			or “<a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>”s of them.</p>
+			==== example (removes 'myClass' className from the first descendent of element found that has said className):
+			<code class='example'>UniDOM.removeClass(UniDOM.getElementsByClass(element, 'myClass')[0], 'myClass');</code>
+			==== example (removes 'myClass' className from all descendents of element found that have said className):
+			<code class='example'>UniDOM.getElementsByClass(element, 'myClass')._.removeClass('myClass');</code>
+			<del title='SoftMoon-WebWare products now require “UniDOM” to be a top-level Object and no longer support it as a property of “SoftMoon.WebWare”'
+			 >==== example - same as above but exposing only the SoftMoon nameSpace to the window (see more comments at this file’s end):
+			<code class='example'>SoftMoon.WebWare.UniDOM.getElementsByClass(element, 'myClass')._.removeClass('myClass');</code></del></li>
+
+	<li id='globalize'><h4>global-functional programming style</h4>
+			<p>Similar to the name-spaced functional programming style (see above),
+			without needing the “UniDOM” nameSpace to call the power-methods.&nbsp;
+			You must first call&nbsp; <code>UniDOM.globalize()</code> which will dump all of
+			UniDOM’s function-names into the global <code>window</code> namespace.</p>
+			==== example (removes 'myClass' className from the first childNode of element found that has said className):
+				<code class='example'>removeClass(getElementsByClass(element, 'myClass')[0], 'myClass');</code>
+			<p><em>¡¡¡Any “tool” or “framework,” etc. should <strong>never</strong> globalize these functions!!!</em></p>
+			<p>¡¡¡Only the web-page developer can safely make this choice!!!</p></li>
+
+	<li id='wrapperStyle'><h4>wrapper-based object-oriented programming style</h4>
+			with optional support of “Sizzle,” “Slick,”
+			or the new inherent <code>element.querySelectorAll()</code> <acronym title='Document-Object Model'>DOM</acronym> method
+			available in modern <acronym>HTML5</acronym> browsers, etc.&nbsp;
+			(see:&nbsp; <a href='http://sizzlejs.com/'>http://sizzlejs.com/</a>&nbsp; <strong>&amp;</strong>
+			&nbsp;<a href='http://mootools.net/docs/core/Slick/Slick'>http://mootools.net/docs/core/Slick/Slick</a>)
+			<p>Do not pass in elements to the individual methods, only to the initial <code>UniDOM()</code> constructor function.&nbsp;
+			This allows “chaining” on both individual elements and groups of them.&nbsp;
+			Elements returned are “wrapped” with a <code>UniDOM.ElementWrapper</code>,
+			(find the actual Element using:&nbsp; <code>myReturnedElementWrapper.element</code> )
+			and groups of Elements are returned in a <code>UniDOM.ElementWrapperArray</code>,
+			(a real JavaScript<mark class='macronym'>™</mark> <code>Array</code> with added methods tacked on)
+			both of which have all the standard “power methods” to allow chaining.&nbsp;
+			Note that you may distinguish an <code>ElementWrapper</code> using:
+			<code>(myVariable instanceof UniDOM.ElementWrapper)</code>
+			(¡except when <code>myVariable</code> is the window an Error is thrown!)
+			but you cannot distinguish an <code>ElementWrapperArray</code> from any other array
+			without checking the available “tacked on” methods (and these can be forged, if you care).</p>
+			==== example (removes 'myClass' className from the first childNode of element found that has said className):
+				<code class='example'>UniDOM(element).getElementsByClass('myClass')[0].removeClass('myClass');</code>
+			==== example (removes 'myClass' className from all descendents of element found that have said className):
+				<code class='example'>UniDOM(element).getElementsByClass('myClass')._.removeClass('myClass');
+UniDOM(element, true).getElementsByClass('myClass').removeClass('myClass');</code>
+			<p>Note in the example above, by passing in <code>true</code> as the second argument to UniDOM,
+			we do not use the <code>._.</code> interface object as
+			methods are “appliedDirect” to the array returned by <code>getElementsByClass</code>.&nbsp;
+			This may seem to take more characters (unless your script-chain is long), but you can also set the static value&nbsp;
+			<code>UniDOM.ElementWrapperArray.wrappedElements=true</code> &nbsp;to achieve the same effect
+			for every subsequent query.&nbsp;
+			However, “applying direct” does create an extra burden on the processor
+			as the “appliedDirect power methods” are manually added to the real
+			JavaScript<mark class='macronym'>™</mark> <code>Array</code> which is returned,
+			so if your query is in a highly-repetative loop, it may noticeably slow things down on older computers.</p>
+			With “Sizzle,” or “Slick” installed on your web page, or with an <acronym>HTML5</acronym> browser,
+			UniDOM’s code simplifies to:
+			<code class='example'>UniDOM(element, '.myClass')._.removeClass('myClass');</code></li>
+
+	<li id='prototypify'><h4>inherent prototype based object-oriented programming style</h4>
+			<p>This optional “prototype” coding style must be specifically invoked by calling <code>UniDOM.prototypify()</code>
+			which will modify <code>Element.prototype</code> by adding UniDOM’s power methods.&nbsp;
+			We never “pass in” the element, as methods are applied via prototype
+			directly to all Elements in the <acronym title='Document-Object Model'>DOM</acronym>.&nbsp;
+			Returned values are “raw” <acronym title='Document-Object Model'>DOM</acronym> Elements
+			or a <span>“<code>UniDOM.ElementWrapperArray</code>”</span> of them.</p>
+			==== example:
+			<code class='example'>element.getElementsByClass('myClass')[0].removeClass('myClass');</code>
+			<p>Note that while UniDOM’s method will accept the same arguments (plus more) as the
+			<acronym title='Document-Object Model'>DOM</acronym> standard <code>getElementsByClassName()</code>,
+			the latter returns a “live NodeList” that changes as the <acronym title='Document-Object Model'>DOM</acronym> is updated,
+			and we need to retain that functionality for cross-library compatibility.&nbsp;
+			And remember:</p>
+			<p><em>¡Any “tool” or “framework,” etc. should <strong>never</strong> prototypify
+			the <acronym title='Document-Object Model'>DOM</acronym>!</em></p>
+			<p>Only the web-page developer can safely make this choice.</p></li>
+</ul>
+
+
+
+
+<!-- ======================================================================================= -->
+
+
+
+
+<h3>Event handling with UniDOM</h3>
+
+
+<div class='method' id='addEventHandler'>
+<h4><code>addEventHandler(<span class='functional'>element,</span> eventType, handler<span class='optArgs'>[, useCapture <span class='userArgs'>[, userArg1 [, userArg2 … … …]]</span>]</span>)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element(s) to attach the event-handler to.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper"><code>ElementWrapper</code></a> instance,
+				or an array of Elements and/or ElementWrappers.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 2 arguments (plus any optional- &amp; user-arguments),
+				as the element is then figured by this method’s Object.</dd>
+	<dt id='eventType'><code>eventType</code></dt>
+		<dd>Event-types may be passed in with or without the prefixed “on” and are case-insensitive.&nbsp;
+				You may pass in a single event-type (as a String), or an array of event-types.&nbsp;
+				All event-types passed in will be “bound” to all elements passed in, and
+				all event-handlers you pass in will be called upon by every one of these event-types.&nbsp;
+				Custom user-defined event types may be used.&nbsp; With legacy versions of Micorsoft’s<mark class='macronym'>®</mark>
+				Internet Exploder, since custom events can not be used as “listeners,” UniDOM keeps track
+				of these and “manually fires” them using <a href='#generateEvent'>generateEvent</a>.</dd>
+	<dt id='handlerArray'><code>handler</code></dt>
+		<dd>You may add a single event handler, or an array of event handlers (using one single call to addEventHandler())
+		to be called in order by the wrapper function.&nbsp;
+		That is, all handlers will be called by each <code>eventType</code> you add.&nbsp;
+		When you add [an] event handler[s], it/they is/are “wrapped” with an internal closure-function,
+		and this wrapper is then the actual attached event handler.&nbsp;
+		Each handler added using <code>addEventHandler()</code> may be:
+		<ul>
+			<li>a function (same as usual for standard <acronym title='Document-Object Model'>DOM</acronym> or MSIE)</li>
+			<li>an Object with a generic “<code>handleEvent</code>” method  (Mozilla<mark class='macronym'>®</mark>
+					Firefox<mark class='macronym'>®</mark> style)</li>
+			<li>an Object with a method to match the event type,
+					i.e. <code>myObject.onclick</code>, <code>myObject.onmouseover</code>, <code>myObject.onfocus</code>, etc.&nbsp;
+					The method name <strong>must</strong> be the event-type in all lowercase,
+					prefixed with “on”, regardless of how you registered it.</li>
+		</ul>
+		Preference given in reverse order from the above presentation;&nbsp;
+		therefore note in these example possibilities below that “mousemove” is logged in the console as “unhandled”:
+		<code class='example'>=====
+myHandler=function(event) {console.log("myHandler unhandled "+event.type+" → "+event.target.name)};
+myHandler.onclick=function(event) {…  …  …};
+myHandler.onmouseover=function(event) {…  …  …};
+myHandler.onmouseout=function(event) {…  …  …};
+UniDOM.addEventHandler(element, ['click', 'mouseOver', 'mouseMove', 'mouseOut'], myHandler);
+=====
+myObject={/*…  …  properties and methods, foos and bazes …  …*/}
+myObject.handleEvent(event) {console.log("myObject unhandled "+event.type+" → "+event.target.name)};
+myObject.onclick=function(event) {…  …  …};
+myObject.onmouseover=function(event) {…  …  …};
+myObject.onmouseout=function(event) {…  …  …};
+UniDOM.addEventHandler(element, ['click', 'mouseOver', 'mouseMove', 'mouseOut'], myObject);
+=====</code>
+		You may also pass in an Array of handlers and all will be called in order, so given the examples above, we can do:
+		<code class='example'>=====
+anotherHandler=function(event) {/*…  …handle all events…  …*/};
+UniDOM.addEventHandler(element, ['click', 'mouseOver', 'mouseMove', 'mouseOut'], [myHandler, myObject, anotherHandler]);
+=====</code>
+		When using multiple event-handlers (in an Array), any one of them may change the
+		property “doContinue” of the “event” object to “false”  ( <code>event.doContinue=false;</code> )
+		to cancel calling the rest in the Array.&nbsp; This will <strong>not</strong> cancel bubbling or capturing,
+		and this will <strong>not</strong> cancel other event-handlers added using a separate call to “addEventHandler”.<br />
+		¡¡¡Don’t forget an Array of event-handlers is <strong>{{live}}</strong>,
+		so you can change it <string>after</strong> you add it;
+		therefore, additions to an Array of event-handlers are affected by and can effect “<code>event.doContinue</code>”!!!<br />
+		In the example below (given the examples above), no “unhandled” events will be logged:
+		<code class='example'>=====
+anotherHandler=function(event) {
+	if (event.type=='mousemove')  event.doContinue=false; //block the rest of the handlers in the handler-array
+	/*…  …handle all mouseMove events…  …*/  };
+UniDOM.addEventHandler(element, ['click', 'mouseOver', 'mouseMove', 'mouseOut'], [anotherHandler, myHandler, myObject]);
+=====</code>
+		The value of the JavaScript<mark class='macronym'>™</mark> keyword “<code>this</code>”
+		within the added handler function or Object method will be as follows:
+		<table>
+		<tr><td>function</td><td>  →  <code>this=</code>  →  </td><td>the Element to which the event handler was “added”</td></tr>
+		<tr><td><code>myObject.handleEvent</code></td><td>  →  <code>this=</code>  →  </td><td><code>myObject</code></td></tr>
+		<tr><td><code>myObject['on'+event.type]</code></td><td>  →  <code>this=</code>  →  </td><td><code>myObject</code></td></tr>
+		</table>
+		The wrapper sends	to your handlers a hybrid EventObject which guarantees at least the following cross-browser properties:
+
+		<table id='hybrid_event'><caption>event ={</caption>
+		<tr><td><code>id:</code></td><td>unique id generated for each event</td></tr>
+
+		<tr><td><code>target:</code></td><td>MSIE’s <code>event.srcElement</code>&nbsp; → &nbsp;the Element, Document, or Window
+				that generated the event, i.e. a <em>possible</em> <code>childNode</code>
+				of the <span>“<code>currentTarget</code>”</span> element during capture or bubble phases.</td></tr>
+		<tr><td><code>currentTarget:</code></td><td><code>element</code>&nbsp; → &nbsp;the current element which is handling the event,
+				to which an event handler is attached (value of “<code>this</code>” when an event-handler is attached to
+				or is a property of an Element).</td></tr>
+		<tr><td><code>relatedTarget:</code></td><td>MSIE’s <code>(event.fromElement || event.toElement)</code>
+				the Element from which the mouse is going/coming.</td></tr>
+		<tr><td><code>eventPhase:</code></td><td><code>1</code> &nbsp; ← when using MSIE, only when you
+				employ the simulated capture phase.</td></tr>
+		<tr><td><code>eventPhase:</code></td><td>MSIE’s <code>(event.srcElement===element) ? 2 : 3</code>
+				where element is the one you attach the event to.&nbsp; (2 is the “on <code>target</code>” phase;
+				3 is the bubbling phase; same as standards)</td></tr>
+		<tr><td><code>charCode:</code></td><td>MSIE’s <code>event.keycode</code></td></tr>
+		<tr><td><code>offsetX:</code></td><td>↓→mouse offset from the “target” element:</td></tr>
+		<tr><td><code>offsetY:</code></td><td>↑→calculated for standards-complient browsers <em>when applicable to the event type</em></td></tr>
+		<tr><td><code>currentX:</code></td><td>↓→mouse offset from the “currentTarget” element:</td></tr>
+		<tr><td><code>currentY:</code></td><td>↑→calculated for standards-complient browsers <em>when applicable to the event type</em></td></tr>
+
+		<tr><td><code>stopPropagation:</code></td><td>with MSIE: <code>function()  {this.cancelBubble=true;}</code>
+				This will also stop propagation during the simulated capturing phase.</td></tr>
+		<tr><td><code>preventDefault:</code></td><td>with MSIE: <code>function()  {this.returnValue=false;}</code></td></tr>
+
+		<tr><td><code>MSIE:</code></td><td><code>true</code> when using
+				legacy <acronym title='Document-Object Model'>DOM</acronym> event-handling with
+				old versions (<acronym>IE9</acronym> &amp; earlier) of Microsoft’s Internet Exploder; undefined otherwise.&nbsp;
+				Do note that <acronym>IE9</acronym> <strong>can</strong> use standard <acronym title='Document-Object Model'>DOM</acronym>
+				event-handling (as well as its legacy <acronym title='Document-Object Model'>DOM</acronym> package),
+				and when using the standards, this property’s value will be undefined.</td></tr>
+		<tfoot>
+		<tr><td colspan='2'>}</td></tr>
+		</tfoot>
+		</table></dd>
+
+	<dt><code class='optArgs'>useCapture</code></dt>
+		<dd>Boolean: default=<code>false</code>&nbsp; For Microsoft’s Internet Exploder,
+				the “capturing phase” of an event is simulated, provided that both
+				the “capturing” event handlers and any event handlers on descendent elements are registered with UniDOM.&nbsp;
+				See also the <a href='#enable_oldMSIE'><code>UniDOM.enable_oldMSIE_capture()</code></a> function
+				to guarantee this provision when also using third-party software that doesn’t use UniDOM.&nbsp;
+				You should use <code>event.stopPropagation()</code> as with the
+				standard <acronym title='Document-Object Model'>DOM</acronym>, within any phase of the event.</dd>
+
+	<dt><code class='userArgs'>userArg</code> … … …</dt>
+		<dd>You may pass in any number of optional user arguments, and each will be passed as a unique argument to every
+				one of your event handlers in your <a href='#handlerArray'><code>handler</code>-array</a>.&nbsp;
+				For example, you might have an <acronym>HTML</acronym> photo gallery, with photos displayed in order of popularity.&nbsp;
+				The page is loaded with the gallery, and on the side-bar you want to use JavaScript<mark class='macronym'>™</mark>
+				to add an alphabetized list of people who took each photo.&nbsp;
+				So your script would gather the images and their respective data, build the sidebar menu,
+				and attach an <code>onClick</code> or <code>onMouseOver</code> event-handler to each menu item:
+				<code class='example'>//given an Object containing the &lt;img/&gt; tags
+// and an alphabetized array of objects holding the photographer’s name &amp rank:
+for (var i=0;  i&lt;data.length;  i++)  {
+&nbsp; li=build_li_(data[i].name);  // use your function defined elsewhere
+&nbsp; UniDOM.addEventHandler(li, ['onMouseOver', 'onClick'], popPic, false,
+&nbsp; &nbsp; &nbsp; images[data[i].imageName], data[i].imageName, data[i].photographer, data[i].rank, document.body);  }
+// and now our popPic function is very generic, versatile, and easy to read:
+function popPic(event, imageTag, imageName, photographer, rank, container)  {
+&nbsp; var popup, old;
+&nbsp; popup=document.createElement('div');
+&nbsp; popup.appendChild(imageTag.cloneNode(false));
+&nbsp; popup.appendChild(document.createTextNode(imageName + ' by ' + photographer + ': ' + rank + '%'));
+&nbsp; popup.id='rank_popup';
+&nbsp; if (old=document.getElementById('rank_popup'))
+&nbsp; &nbsp; old.parentNode.replaceChild(old, popup);
+&nbsp; else  container.appendChild(popup);
+&nbsp; if (event.type==='click')  imageTag.scrollIntoView();  }</code>
+		</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>UniDOM’s <code>addEventHandler</code> returns either:&nbsp;
+•an Object holding references to “<a href='#EventHandler'><code>UniDOM.EventHandler</code></a>” instance-Objects;
+or if you “pass in” an array of elements, •a corresponding array of the above-said “holding-Objects.”&nbsp;
+Each of the “holding-Object’s” properties correspond to each event type registered.&nbsp;
+Each “holding-Object” property name is the exact same as you pass in for the event type.&nbsp;
+The <a href='#EventHandler'><code>UniDOM.EventHandler</code></a> instance-Objects hold vital info about your attached
+event handlers, and have <em>live</em> active members.&nbsp;
+Here’s a possible example of an Object returned:</p>
+<code class='example'>rtnval = UniDOM.addEventHandler(element,
+	['onMouseOver', 'onMouseOut', 'click'],
+	myMouseHandler);
+/* an example of rtnval = {
+	onMouseOver: // a UniDOM.EventHandler instance
+	onMouseOut: // a UniDOM.EventHandler instance
+	click: // a UniDOM.EventHandler instance
+	}
+*/</code>
+</div>
+<br /><!-- ouch! -->
+<div class='properties' id='addEH_properties'><h5>Static Properties:</h5>
+<p>You may globally alter some features of the <code>addEventHandler()</code> function.</p>
+<table class='jsObject'><caption>static properties of <code>UniDOM.addEventHandler</code></caption>
+<tr><th>property</th> <th>initial value</th> <th>description</th></tr>
+<tr><td><code>errorOnDoubleBind:</code></td> <td><code>false</code></td>
+		<td>This Boolean flag controls whether to throw an Error when trying to double-bind the same
+				</code>handler</code> function(s) with the same <code>eventTypes</code> on the same
+				<code>element</code> using the same <code>useCapture</code> flag.&nbsp;
+				UniDOM will never double-bind, and if this flag is false, attempts to do so will be silently ignored!</td></tr>
+<tr><td><code>retroMSIE9:</code></td> <td><code>null</code></td>
+		<td>This Boolean flag controls whether MSIE9 should use its legacy <code>attachEvent()</code>
+				method (with UniDOM’s simulated capture) or the standard
+				<acronym title='Document-Object Model'>DOM</acronym> <code>addEventListener()</code> method.&nbsp;
+				It also controls whether <code>UniDOM.generateEvent()</code> &amp; <code>UniDOM.triggerEvent()</code>
+				use <code>fireEvent()</code> (Boolean <code>true</code>)
+				or the standard <code>dispatchEvent()</code> (Boolean <code>false</code>),
+				or with <code>UniDOM.generateEvent()</code> <em><strong>both</strong></em> if this flag is <code>null</code>.&nbsp;
+				When I once tried to use two separate JavaScript<mark class='macronym'>™</mark>
+				software packages that used opposing methods from each-other,
+				I started getting stack-overflows when one function called another in succession
+				(functions that were <em>not</em> even event related!), and what seemed like memory corruption causing
+				browser instability.</td></tr>
+</table>
+</div>
+</div><!-- close  addEventHandler  -->
+
+<hr />
+
+<div class='instance' id='EventHandler'>
+<h4><code>UniDOM.EventHandler</code> Object instances</h4>
+<table class='jsObject'><caption>A <code>UniDOM.EventHandler</code> Object instance has the following properties and method:</caption>
+	<tr><td><code>id:</code></td><td>unique id  ←¡do <em><strong>not</strong></em> change this value!</td></tr>
+	<tr><td><code>element:</code></td><td>¡do <em><strong>not</strong></em> change this value, it is not live!</td></tr>
+	<tr><td><code>eventType:</code></td><td>¡do <em><strong>not</strong></em> change this value, it is not live!&nbsp;
+			This value is all lowercase <em>without</em> the leading “on”</td></tr>
+	<tr><td><code>handler:</code></td><td>{{LIVE}}  an array of the handlers that are executed in order
+			by the wrapper (see below) for each event</td></tr>
+	<tr><td><code>handler.suspend:</code></td><td>{{LIVE}}  Boolean value to temporarily suspend calling the handlers
+			(but the wrapper is still active)</td></tr>
+	<tr><td><code>wrapper:</code></td><td>¡do <em><strong>not</strong></em> change this value, it is generally not live!&nbsp;
+			This is the wrapper function that is actually added as an event handler to the element.&nbsp;
+			This wrapper then calls each of the functions in the <code>handler</code> array (see above).&nbsp;
+			You may invoke this wrapper directly ( <code>myEH.wrapper(event);</code> ) to simulate an event.&nbsp;
+			Old MSIE uses this property to simulate event capturing, so in that case,
+			during the <strong>simulated</strong> capture &amp; bubble phases, this property is {{LIVE}}</td></tr>
+	<tr><td><code>userArgs:</code></td><td>{{LIVE}}  an array of user arguments;
+			each passed as an argument to each handler function by the wrapper.</td></tr>
+	<tr><td><code>remove():</code></td><td>This method removes (unbinds) the event handler wrapper from the element
+			and sets this Object’s <code>id</code> to <code>false</code>.&nbsp;
+			(see also <a href='#removeEventHandler'><code>UniDOM.removeEventHandler</code></a>)&nbsp;
+			It is best practice to keep track of your <code>EventHandler</code> returned by UniDOM’s
+			<a href='#addEventHandler'><code>addEventHandler</code></a> and then use it to remove (unbind)
+			the handler from the element:
+<code class='example'>// myBinding will be a plain Object that holds EventHandler instances:
+myBinding=UniDOM.addEventHandler(document.body, "mouseUP", dragDROP, true);
+function dragDROP(event)  {
+&nbsp; //  the  .mouseUP  property is a UniDOM.EventHandler instance:
+&nbsp; myBinding.mouseUP.remove();
+&nbsp; /* now do whatever to drop the dragged thing */  }</code></td></tr>
+</table>
+
+<p>You may alter the arrays of the “<code>handler</code>” and “<code>userArgs</code>” properties of a
+<code>UniDOM.EventHandler</code> Object, but replacing them is ineffective.&nbsp;
+For instance you may push, pop, shift, unshift or otherwise alter the <code>handler</code> and <code>userArgs</code> arrays,
+and the wrapper function will call the functions in the modified handler-array, passing the arguments in the
+modified userArgs-array, though note that even if you remove all the handlers from
+the handler-array, the “<code>wrapper</code>” will still be attached to the element and active.</p>
+
+<p>You may use:<br />
+<code>(myUnknownVariable instanceof UniDOM.EventHandler)</code> in your scripts,
+but UniDOM prevents you from creating an instance by scripting <code>myEH=new UniDOM.EventHandler(… … …);</code>
+or <code>myEH=UniDOM.EventHandler(… … …);</code>&nbsp;
+You can only create an instance by using UniDOM’s <a href='#addEventHandler'><code>addEventHandler</code></a>.&nbsp;
+The created instance is returned as a sub-property of the returned Object.&nbsp;
+See: <a href='#addEventHandler'><code>addEventHandler</code></a>’s return value.</p>
+</div><!-- close  EventHandler  -->
+
+<hr />
+
+<div class='method' id='removeEventHandler'>
+<h4><code>removeEventHandler(EventHandler_instance)  //preferred</code>
+<code>removeEventHandler(<span class='functional'>element,</span> eventType, handler, useCapture)</code></h4>
+<p>It is easiest to keep track of the <a href='#EventHandler'><code>UniDOM.EventHandler</code></a>
+instance returned when you add an event handler.&nbsp;
+In that case, you can simply use <code>myEH.remove();</code>
+(see <a href='#EventHandler'><code>UniDOM.EventHandler</code></a>).&nbsp;
+If you want or need to, you may instead pass the whole <code>EventHandler</code> instance to this function.</p>
+<p>If you don’t have access in the scope of a function to the <code>EventHandler</code> instance
+returned when the handler was added by UniDOM, you can use the long-form of this function instead
+(similar to the <acronym title='Document-Object Model'>DOM</acronym> standard way).<p>
+<p>See <a href='#getEventHandler'><code>getEventHandler</code></a> (below) for info on the arguments
+passed in to this function when using its long-form.<p>
+
+</div><!-- close  removeEventHandler  -->
+
+<hr />
+
+<div class='method' id='getEventHandler'>
+<h4><code>getEventHandler(<span class='functional'>element,</span> eventType, handler, useCapture)</code></h4>
+<p>If you don’t have access in the scope of a function to the
+<a href='#EventHandler'><code>UniDOM.EventHandler</code></a> instance
+returned when the handler was added by UniDOM, you can use this function to get it.</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element the event-handler is attached to.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper"><code>ElementWrapper</code></a> instance.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 3 arguments,
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>eventType</code></dt>
+		<dd>You may pass in only one Event-type.&nbsp;
+				Event-types may be passed in with or without the prefixed “on” and are case-insensitive.</dd>
+	<dt><code>handler</code></dt>
+		<dd>You must pass in the same handler function that you added, or an array that contains
+				the same handler functions in the same order.&nbsp;
+				Since a <code>UniDOM.EventHandler</code> array is {{LIVE}} (you can change it at any time)
+				if you do change it after you <span>“<code>addEventHandler</code>”</span> you must pass in the modified
+				current handler selection.</dd>
+	<dt><code>useCapture</code></dt>
+		<dd>must match the Boolean value you passed in when you added the event handler.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+	<p>The properly corresponding <a href='#EventHandler'><code>UniDOM.EventHandler</code></a> instance.</p>
+</div>
+</div><!-- close  getEventHandler  -->
+
+
+<hr />
+
+<div class='method' id='removeAllEventHandlers'>
+<h4><code>removeAllEventHandlers(<span class='functional'>element,</span>
+	<span class='optArgs'>[goDeep]</span>)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element the event-handlers are attached to.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper"><code>ElementWrapper</code></a> instance.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				the element is then figured by this method’s Object.</dd>
+	<dt><code class='optArgs'>goDeep</code></dt>
+		<dd>Optional: default is <code>false</code>.&nbsp;
+			Whether to remove handlers from <acronym title='Document-Object Model'>DOM</acronym> childnodes and recursively their children.&nbsp;
+			See <a href='#getElements'><code>getElements</code></a> for more details on the use of this parameter.</dd>
+</dl>
+</div><!-- close  removeAllEventHandlers  -->
+
+<hr />
+
+<div class='method' id='generateEvent'>
+<h4><code>generateEvent(<span class='functional'>element,</span> eventType, eSpecs)</code></h4>
+<p>For high-level event-creation.&nbsp; This will create a new Event-Object and then dispatch/fire
+an event using it, and is cross-browser friendly.&nbsp;
+For legacy versions of MSIE that do not recognize custom user-defined (synthetic) event-types, this method will simulate
+properly “firing” the custom event if it was registered using UniDOM’s <a href='#addEventHandler'>addEventHandler</a>.</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element to generate the event on.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper"><code>ElementWrapper</code></a> instance.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 2 arguments,
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>eventType</code></dt>
+		<dd>You may pass in one Event-type or an Array of Event-types.&nbsp;
+				Event-types may be passed in with or without the prefixed “on” and are case-insensitive.</dd>
+	<dt><code>eSpecs</code></dt>
+		<dd>An object with property names to define the specifications for the Event you want to generate.&nbsp;
+				Please refer to a good book on JavaScript<mark class='macronym'>™</mark> for further info.&nbsp;
+				Note you <strong>must</strong> supply a value for <code>eSpecs.view</code> if you want
+				to set any other explicit specifications (except <code>eSpecs.canBubble</code> and <code>eSpecs.cancelable</code>).&nbsp;
+				Some example specs are below for all browsers <em><strong>except</strong></em> old MSIE:
+<table>
+	<tr><td><code>eSpecs.canBubble, eSpecs.cancelable</code></td><th>all Events</th></tr>
+	<tr><td><code>eSpecs.view, eSpecs.detail</code></td><th>UIEvents (includes key events and mouse events)</th></tr>
+	<tr><td><code>eSpecs.screenX, eSpecs.screenY, eSpecs.clientX, eSpecs.clientY,
+					eSpecs.ctrlKey, eSpecs.altKey, eSpecs.shiftKey, eSpecs.metaKey,
+					eSpecs.button, eSpecs.relatedTarget</code></td><th>MouseEvents</th></tr>
+	<tr><td><code>eSpecs.buttons, eSpecs.movementX, eSpecs.movementY, eSpecs.offsetX,
+					eSpecs.offsetY, eSpecs.region, eSpecs.which</code></td><th>MouseEvents in newer browsers</th></tr>
+</table>
+				For all browsers <em><strong>including</strong></em> old MSIE:
+<code class='example'>if (eSpecs.userArgs)  for (p in eSpecs.userArgs)  {event[p]=eSpecs.userArgs[p];}</code>
+		</dd>
+</dl>
+<div class='properties'><h5>Related Static Properties:</h5>
+<table class='jsObject'><caption>static properties of <code>UniDOM.addEventHandler</code></caption>
+<tr><th>property</th> <th>initial value</th> <th>description</th></tr>
+<tr><td><code>retroMSIE9:</code></td> <td><code>null</code></td>
+		<td>This Boolean flag controls whether MSIE9 should use its legacy <code>attachEvent()</code>
+				method (with UniDOM’s simulated capture) or the standard
+				<acronym title='Document-Object Model'>DOM</acronym> <code>addEventListener()</code> method.&nbsp;
+				It also controls whether <code>UniDOM.generateEvent()</code> &amp; <code>UniDOM.triggerEvent()</code>
+				use <code>fireEvent()</code> (Boolean <code>true</code>)
+				or the standard <code>dispatchEvent()</code> (Boolean <code>false</code>),
+				or with <code>UniDOM.generateEvent()</code> <em><strong>both</strong></em> if this flag is <code>null</code>.&nbsp;
+				When I once tried to use two separate JavaScript<mark class='macronym'>™</mark>
+				software packages that used opposing methods from each-other,
+				I started getting stack-overflows when one function called another in succession
+				(functions that were <em>not</em> even event related!), and what seemed like memory corruption causing
+				browser instability.</td></tr>
+</table>
+</div>
+</div><!-- close  generateEvent  -->
+
+<hr />
+
+<div class='method' id='triggerEvent'>
+<h4><code>triggerEvent(<span class='functional'>element,</span> event)</code></h4>
+<p>For low-level event-creation.&nbsp; You must create your own new Event-Object (you can not reuse one
+once the event has occurred).&nbsp; You must determine the proper method (old MSIE or standard)
+for creating your new Event-Object, but this function is then cross-browser friendly.&nbsp;
+This method is currently not available in the
+<a href='#prototypify'>“Element-prototype” programming style.</a></p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element to dispatch the event on.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument,
+				as the element is then figured by this method’s Object.</dd>
+	<dt>event</dt>
+		<dd>An Event-object created with your low-level code using <code>document.createEvent</code>
+				or <code>document.createEventObject</code>.</dd>
+</dl>
+<div class='properties'><h5>Related Static Properties:</h5>
+<table class='jsObject'><caption>static properties of <code>UniDOM.addEventHandler</code></caption>
+<tr><th>property</th> <th>initial value</th> <th>description</th></tr>
+<tr><td><code>retroMSIE9:</code></td> <td><code>null</code></td>
+		<td>This Boolean flag controls whether MSIE9 should use its legacy <code>attachEvent()</code>
+				method (with UniDOM’s simulated capture) or the standard
+				<acronym title='Document-Object Model'>DOM</acronym> <code>addEventListener()</code> method.&nbsp;
+				It also controls whether <code>UniDOM.generateEvent()</code> &amp; <code>UniDOM.triggerEvent()</code>
+				use <code>fireEvent()</code> (Boolean <code>true</code>)
+				or the standard <code>dispatchEvent()</code> (Boolean <code>false</code>),
+				or with <code>UniDOM.generateEvent()</code> <em><strong>both</strong></em> if this flag is <code>null</code>.&nbsp;
+				When I once tried to use two separate JavaScript<mark class='macronym'>™</mark>
+				software packages that used opposing methods from each-other,
+				I started getting stack-overflows when one function called another in succession
+				(functions that were <em>not</em> even event related!), and what seemed like memory corruption causing
+				browser instability.</td></tr>
+</table>
+</div>
+</div><!-- close  triggerEvent  -->
+
+<hr />
+
+<div class='method' id='enable_oldMSIE'>
+<h4><code>enable_oldMSIE_capture()</code></h4>
+<p>If you want to use UniDOM’s simulated capture function with old versions Microsoft’s Internet Exploder,
+and you need to be able to use third-party JavaScript<mark class='macronym'>™</mark> scripts at the same time,
+call this function <strong><em>before loading any third-party scripts</em></strong>.&nbsp;
+This will modify the <acronym title='Document-Object Model'>DOM</acronym>’s ElementNode prototype “attachEvent” method
+to run through UniDOM’s script for compatibility; otherwise, third-party event-handlers
+can not be blocked during the simulated capture, or bubbling may occur twice.&nbsp;</p>
+</div><!-- close  enable_oldMSIE_capture  -->
+
+<hr />
+
+<div class='method' id='setMouseEventOffset'>
+<h4><code>setMouseEventOffsets(event)</code></h4>
+<p>For Firefox<mark class='macronym'>®</mark> and other older browsers that do not support the non-standard
+<code>event.offsetX</code>, <code>event.offsetY</code>,
+<code>event.currentX</code>, and <code>event.currentY</code> properties introduced by <acronym>MSIE</scronym>.&nbsp;
+This function is called automatically by UniDOM’s event-handler “wrappers” as needed,
+so there is no need to call this function
+independently if you use <a href='#addEventHandler'><code>UniDOM.addEventHandler</code></a>.&nbsp;
+Note that this is only available in the <a href='#codeStyles'>functional programming styles</a>,
+<strong>not</strong> as a method of an Element or <code>ElementWrapper</code>.</p>
+<dl class='params'>
+	<dt>event</dt>
+		<dd>A standard event-Object (which holds the mouse position on the window).</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>The <code>event</code>-Object modified to reflect the mouse-offset-distances from the <code>event.target</code>
+and <code>event.currentTarget</code>.</p>
+</div>
+</div><!-- close  setMouseEventOffsets  -->
+
+<hr />
+
+<div class='method' id='getMouseOffset'>
+<h4><code>getMouseOffset(<span class='functional'>element,</span> event)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element
+				from which to figure the mouse position {x,y} distance.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument,
+				as the element is then figured by this method’s Object.</dd>
+	<dt>event</dt>
+		<dd>A standard event-Object (which holds the mouse position on the window).</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>An Object:<br />
+<code>{x: /*horizontal distance*/ ,<br />
+&nbsp;y: /*vertical distance*/ }</code></p>
+</div>
+</div><!-- close  getMouseOffset  -->
+
+<hr />
+
+<h3>Client Info</h3>
+
+
+<div class='method' id='getScreenXY'>
+<h4><code>getScreenX(<span class='optArgs'>_window_</span>)</code>
+<code>getScreenY(<span class='optArgs'>_window_</span>)</code></h4>
+<p>These functions are only available in the <a href='#codeStyles'>functional programming styles</a>.</p>
+<dl class='params'>
+	<dt><code class='optArgs'>_window_</code></dt>
+		<dd>Optional window-object reference; default is the current window the script is running in.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>The position of the browser on the screen.&nbsp; Legacy-browser friendly.<p>
+</div>
+</div><!-- close  getScreenXY  -->
+
+<hr />
+
+<div class='method' id='getInnerWH'>
+<h4><code>getInnerWidth(<span class='optArgs'>_window_</span>)</code>
+<code>getInnerHeight(<span class='optArgs'>_window_</span>)</code></h4>
+<p>These functions are only available in the <a href='#codeStyles'>functional programming styles</a>.</p>
+<dl class='params'>
+	<dt><code class='optArgs'>_window_</code></dt>
+		<dd>Optional window-object reference; default is the current window the script is running in.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Dimensions of the browser window.&nbsp; Legacy-browser friendly.</p>
+</div>
+</div><!-- close  getInnerWH  -->
+
+<hr />
+
+<div class='method' id='getScrollXY'>
+<h4><code>getScrollX(<span class='optArgs'>_window_</span>)</code>
+<code>getScrollY(<span class='optArgs'>_window_</span>)</code></h4>
+<p>These functions are only available in the <a href='#codeStyles'>functional programming styles</a>.</p>
+<dl class='params'>
+	<dt><code class='optArgs'>_window_</code></dt>
+		<dd>Optional window-object reference; default is the current window the script is running in.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Number of pixels the document is scrolled from the left and top.&nbsp; Legacy-browser friendly.</p>
+</div>
+</div><!--  close  getScrollXY  -->
+
+<hr />
+
+<div class='method' id='getDocumentWH'>
+<h4><code>getDocumentWidth(<span class='optArgs'>_window_</span>)</code>
+<code>getDocumentHeight(<span class='optArgs'>_window_</span>)</code></h4>
+<p>These functions are only available in the <a href='#codeStyles'>functional programming styles</a>.</p>
+<dl class='params'>
+	<dt><code class='optArgs'>_window_</code></dt>
+		<dd>Optional window-object reference; default is the current window the script is running in.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Dimensions of the document.&nbsp; Legacy-browser friendly.</p>
+</div>
+</div><!-- close  getInnerWH  -->
+
+<hr />
+
+<div class='property' id='MS_Exploder'>
+<h4><code>UniDOM.MS_Exploder</code></h4>
+<p>Numerical integer value indicating the base-version of Microsoft’s Internet Exploder,
+or <code>null</code> if UniDOM detected another browser.</p>
+</div><!-- close  MS_Exploder  -->
+
+<hr />
+
+
+
+<h3>DOM query &amp; manipulation tools</h3>
+
+<div class='method' id='getComputedStyle'>
+<h4><code>window.getComputedStyle(element)</code></h4>
+<p>For old versions of Microsoft’s Internet Exploder that don’t have a native version
+of this global function, UniDOM gives you a cross-browser shell-wrapper-function as defined below:</p>
+<code class='example'>function getComputedStyle(element) {return element.currentStyle}</code>
+</div><!-- close  getComputedStyle  -->
+
+<hr />
+
+<div class='method' id='getElementOffset'>
+<h4><code>getElementOffset(<span class='functional'>element,</span> <span class='optArgs'>[scroll]</span>)</code>
+<code>getElementOffset(<span class='functional'>element,</span> <span class='optArgs'>[ancestor]</span>)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element from which to figure the
+				offset distance {x,y} from either the •beginning of the document,
+				or the •viewport (see <code>scroll</code> below), or the •<code>ancestor</code>.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style accepts only 1 optional argument,
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code class='optArgs'>scroll</code></dt>
+		<dd>Optional Boolean: if <code>true</code>, the offset is figured from the top-left corner of the viewport.&nbsp;
+				The default value is <code>false</code>.</dd>
+	<dt><code class='optArgs'>ancestor</code></dt>
+		<dd>If a <acronym title='Document-Object Model'>DOM</acronym> Element
+				which is an ancestor to <code>element</code> is passed, the offset is figured from the
+				<code>ancestor</code>	instead of the document or viewport.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>An Object:<br />
+<code>{x: /*horizontal distance*/ ,<br />
+&nbsp;y: /*vertical distance*/ }</code></p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='isElementNode'>
+<h4><code>isElementNode(<span class='functional'>unknown</span>)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>unknown</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The value to test.&nbsp; You may pass in a single unknown value.&nbsp;
+				Do <em>not</em> pass in a value for <code>unknown</code> when using the <code>ElementWrapper</code>—based
+				Object-oriented <a href='#codeStyles'>programming style</a>;
+				the value is then figured by this method’s Object.&nbsp;
+				Note that UniDOM’s Element-gathering functions can also gather
+				<acronym title='Document-Object model'>DOM</acronym> Nodes other than Elements,
+				and these may then be wrapped with a <code>UniDOM.ElementWrapper</code>.&nbsp;
+				Note also that while this is primarily used as a <a href='#codeStyles'>functional</a>
+				(as <code>UniDOM.isElementNode()</code> or the equivalent as a global function)
+				and also a —method— of an <code>ElementWrapper</code>,
+				logically there is no equivalent method in UniDOM’s
+				<a href='#prototypify'>Element-prototype—based programming style</a>.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Boolean</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='getAncestor'>
+<h4><code>getAncestor(<span class='functional'>element,</span> cb
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document <em><strong>backwards</strong></em> to find the matching ancestor element of
+<code>element</code>, and possibly recursively its ancestors, depending on <code>goDeep</code>.</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element from which to begin crawling the document.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus any of the optional arguments),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>cb</code></dt>
+		<dd>Callback function: should decide whether each element passed to it is the ancestor
+				of choice and return a Boolean value indicating such choice.</dd>
+	<dt><code class='optArgs'>goDeep</code></dt>
+		<dd>Whether to (continue to) recursively check the <code>parentNode</code>(s) of the matching element(s).&nbsp;
+				May be: •Boolean (default is <code>false</code> for <code>getAncestor</code> methods,
+				<span class='grayNote'><code>true</code> for <code>getElements</code> methods</span>) or
+				a •function that evaluates each individual element passed to it and returns a Boolean value.&nbsp;
+				When <code>goDeep</code> is a function,
+				a second argument is also passed to it referring back to the “context” <code>element</code>
+				which was passed into this <code>getAncestor</code> function.&nbsp;
+				UniDOM’s <code>getAncestor()</code> and <code>getElements()</code> each work a little different
+				depending on the value of <code>goDeep</code>.&nbsp;
+				With <code>getAncestor()</code> methods, <code>goDeep</code> is ignored until the first match is found.&nbsp;
+				If <code>goDeep==false</code> or alternatively <code>goDeep()==false</code> after a match is found,
+				then the query ends and the matching ancestor(s) will be returned.</dd>
+	<dt><code class='optArgs'>ojbFltr</code></dt>
+		<dd>An Object-property-name-filter function to enhance the returned Array value with named properties
+				referring to members of the Array.&nbsp; See: <a href='#objectify'><code>objectify</code></a>.</dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply “power methods” directly to returned arrays?&nbsp;
+				See the <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a> constructor.</dd>
+	<dt><code class='optArgs'>powerSelect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply nonstandard methods (<code>getSelected()</code> &amp; <code>setSelected()</code>)
+				to <code>&lt;select&gt;</code> elements?&nbsp;
+				See: <a href='#powerSelect'><code>powerSelect</code></a>.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>If no match is found, <code>false</code> is returned.&nbsp;
+If <code>goDeep</code> evaluates to <code>false</code> on the first match found, that single element will be returned.&nbsp;
+If <code>goDeep</code> evaluates to <code>true</code> on the first match found, an
+<a href='#ElementWrapperArray'><code>ElementWrapperArray</code></a> (a simple Array with added “UniDOM power methods”)
+is returned (the result may only be one member, or multiple members of elements).&nbsp;
+¡Note that the returned array is in <em><strong>reverse order</strong></em> from the document contents!</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='getElements'>
+<h4><code>getElements(<span class='functional'>element,</span> cb
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document to gather the matching <code>childNodes</code> of <code>element</code>,
+and possibly recursively their children depending on <code>goDeep</code>.</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element from which to begin crawling the document.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus any of the optional arguments),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>cb</code></dt>
+		<dd>Callback function: should decide whether each element passed to it is the descendent
+				of choice and return a Boolean value indicating such choice.</dd>
+	<dt><code class='optArgs'>goDeep</code></dt>
+		<dd>Whether to recursively check <code>childNode</code>s of the element.&nbsp; May be:
+				•Boolean (default is <code>true</code> for <code>getElements</code> methods,
+				<span class='grayNote'><code>false</code> for <code>getAncestor</code> methods</span>) or
+				a •function that evaluates each individual element passed to it and returns a Boolean value.&nbsp;
+				When <code>goDeep</code> is a function,
+				a second argument is also passed to it referring back to the “context” <code>element</code>
+				which was passed into this <code>getElements</code> function.&nbsp;
+				UniDOM’s <code>getAncestor()</code> and <code>getElements()</code> each work a little different
+				depending on the value of <code>goDeep</code>.&nbsp;
+				With <code>getElements()</code> methods, if <code>goDeep=false</code> then the children
+				of each element will <em><srong>not</strong></em> be considered.&nbsp;
+				For <code>getElements</code>, <code>getJuniors</code>, and <code>getElders</code> methods,
+				when <code>goDeep</code> is a function,
+				it may also set the <code>doContinue</code> property of itself to <code>false</code>
+				using the code <code>arguments.callee.doContinue=false</code>
+				(or even the callback <code>cb</code> function may set <code>goDeep.doContinue=false</code>),
+				and the query will terminate immediately.&nbsp;
+				Note that UniDOM always resets the <code>doContinue</code> property to <code>true</code>
+				when it starts a query, so you don’t need to worry about resetting it.</dd>
+	<dt><code class='optArgs'>ojbFltr</code></dt>
+		<dd>An Object-property-name-filter function to enhance the returned Array value with named properties
+				referring to members of the Array.&nbsp; See: <a href='#objectify'><code>objectify</code></a>.</dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply “power methods” directly to returned arrays?&nbsp;
+				See the <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a> constructor.</dd>
+	<dt><code class='optArgs'>powerSelect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply nonstandard methods (<code>getSelected()</code> &amp; <code>setSelected()</code>)
+				to <code>&lt;select&gt;</code> elements?&nbsp;
+				See: <a href='#powerSelect'><code>powerSelect</code></a>.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>If matching elements are found, returns an <a href='#ElementWrapperArray'><code>ElementWrapperArray</code></a>
+(a simple Array with added “UniDOM power methods”) of HTML elements (though there may only be one array member).&nbsp;
+Returns an empty array if no matches found.</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='getJuniors'>
+<h4><code>getJuniors(<span class='functional'>element,</span> cb
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document of all
+<acronym title='Document-Object Model'>DOM</acronym> Elements following <code>element</code>
+(its childNodes and following siblings),
+and possibly recursively their children and ancestors’ following siblings depending on <code>goDeep</code>,
+to gather matching <acronym title='Document-Object Model'>DOM</acronym> Elements.&nbsp;
+See <a href='#getElements'><code>getElements</code></a> for details on arguments passed to this function,
+and the return value from this function.</p>
+<p>This useful example below uses the <code>getJuniors</code> method; but it also exemplifies for
+<code>getAncestor</code>, <code>getElements</code>, and <code>getElders</code> how to use
+the callback <code>cb</code> function and how to pass a function for <code>goDeep</code>.&nbsp;
+It also exemplifies using <code>goDeep.doContinue</code>, but that feature is not available for
+<code>getAncestor</code> since it is illogical: you simply pass <code>false</code> from <code>goDeep()</code>
+to achieve the same result of immediately terminating the query.</p>
+<code class='example'>var goDeep=function(e) {return !(e.className.match( /\bdisabled\b/ ));},
+&nbsp;   cb=function(e)  {
+&nbsp;       if (( (e.nodeName==='INPUT' &amp;&amp; e.type==='text')
+&nbsp;           || e.nodeName==='TEXTAREA' )
+&nbsp;       &amp;&amp; !e.disabled)  {
+&nbsp;         goDeep.doContinue=false;
+&nbsp;         return true;  }
+&nbsp;       else return false;  },
+&nbsp;   nextTextIn=UniDOM.getJuniors(currentTextIn, cb, goDeep)[0];
+</code>
+</div>
+
+<hr />
+
+<div class='method' id='getElders'>
+<h4><code>getElders(<span class='functional'>element,</span> cb
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document <em><strong>backwards</strong></em> of all
+<acronym title='Document-Object Model'>DOM</acronym> Elements preceding <code>element</code>
+(its preceding siblings and parentNode),
+and possibly recursively their children and ancestors’ previous siblings depending on <code>goDeep</code>,
+to gather matching <acronym title='Document-Object Model'>DOM</acronym> Elements.&nbsp;
+See <a href='#getElements'><code>getElements</code></a> for details on arguments passed to this function,
+and the return value from this function, except:&nbsp;
+¡Note that the returned array is in <em><strong>reverse order</strong></em> from the document contents!</p>
+</div>
+
+<hr />
+
+<div class='method' id='hasAncestor'>
+<h4><code>hasAncestor(<span class='functional'>element,</span> unknown)</code></h4>
+<p>Crawls (transverses) the document to see if <code>unknown</code> is an ancestor of <code>element</code>.</p>
+</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element from which to begin crawling the document.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument,
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>unknown</code></dt>
+		<dd>The variable you want to check to see if it is an ancestor of <code>element</code>.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Returns a Boolean value reflecting the truth of the logic it was passed to evaluate.</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='hasElement'>
+<h4><code>hasElement(<span class='functional'>element,</span> unknown)</code></h4>
+<p>Crawls (transverses) the document to see if <code>unknown</code> is a descendent of <code>element</code>.&nbsp;
+Note that this function is the inverse of <a href='#hasAncestor'>hasAncestor</a>; internally it uses
+the code <code>hasAncestor(unknown, element)</code> which is faster than transversing the <acronym title='Document-Object Model'>DOM</acronym>
+tree forward through all branches.&nbsp; But also note that <code>unknown</code> may be <strong>any</strong> value,
+whereas <code>element</code> should be a <acronym title='Document-Object Model'>DOM</acronym> element node;
+this function therefore gives the user two advantages: a logical syntax that is easy to understand when read,
+and an extra condition to check that <code>unknown</code> is indeed an element before internally calling <code>hasAncestor</code>
+which requires its first argument to be an <code>element</code>.</p>
+</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element from which to begin crawling the document.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument,
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>unknown</code></dt>
+		<dd>The variable you want to check to see if it is a descendent of <code>element</code>.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Returns a Boolean value reflecting the truth of the logic it was passed to evaluate.</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='getElementsByName'>
+<h4><code>getElementsByName(<span class='functional'>element,</span> name
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document to gather the matching <code>childNodes</code> of <code>element</code>,
+and possibly recursively their children depending on <code>goDeep</code>.
+See <a href='#getElements'><code>getElements</code></a> for details on arguments other than <code>name</code>
+passed to this function, with the following exception:&nbsp;
+¡Note that this function is unique in that it supplies a default <a href='#objectify'><code>objFltr</code></a>-function
+which will add object-property names to the returned array that match the <code>name</code> attributes
+of the selected Elements!</p>
+<dl class='params'>
+	<dt><code>name</code></dt>
+		<dd>Each Element’s <code>name</code> attribute is compared with the <code>name</code> you pass into this function.&nbsp;
+				You may pass in a String, a Regular-Expression, or a “logic-Array” of Strings, Regular-Expressions,
+				and/or more nested “logic-Arrays”.&nbsp;
+				See UniDOM’s <a href='#has'><code>has</code></a> function for more info on “logic-Arrays”.&nbsp;
+				If you don’t pass in a value for <code>name</code> (or pass in <code>null</code> or an empty string)
+				all elements with a <code>name</code> attribute will be collected
+				(typically, <span><code>&lt;input&gt;</code>s</span>,
+				<span><code>&lt;textarea&gt;</code>s</span> and
+				<span><code>&lt;select&gt;</code>s</span>).</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>If matching elements are found, returns an <a href='#ElementWrapperArray'><code>ElementWrapperArray</code></a>
+(a simple Array with added “UniDOM power methods”) of HTML elements (though there may only be one array member).&nbsp;
+As noted above, the returned array is by default <a href='#objectify'><code>objectified</code></a> with
+property names corresponding to the Elements’ names.</p>
+<p>Returns <code>false</code> if no matches found.</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='getAncestorByClass'>
+<h4><code>getAncestorByClass(<span class='functional'>element,</span> className
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document to gather the matching ancestor(s) of <code>element</code>.
+See <a href='#getAncestor'><code>getAncestor</code></a> for details on arguments other than <code>className</code>
+passed to this function, and the return value from this function.</p>
+</p>
+<dl class='params'>
+	<dt><code>className</code></dt>
+		<dd>Each Element’s <code>className</code> attribute is “properly” compared with the
+				<code>className</code> you pass into this function.&nbsp;
+				See <a href='#hasClass'><code>hasClass</code></a> for detailed information.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='getElementsByClass'>
+<h4><code>getElementsByClass(<span class='functional'>element,</span> className
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document to gather the matching <code>childNodes</code> of <code>element</code>,
+and possibly recursively their children depending on <code>goDeep</code>.
+See <a href='#getElements'><code>getElements</code></a> for details on arguments other than <code>className</code>
+passed to this function, and the return value from this function.</p>
+</p>
+<dl class='params'>
+	<dt><code>className</code></dt>
+		<dd>Each Element’s <code>className</code> attribute is “properly” compared with the
+				<code>className</code> you pass into this function.&nbsp;
+				See <a href='#hasClass'><code>hasClass</code></a> for detailed information.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='getAncestorByComplex'>
+<h4><code>getAncestorByComplex(<span class='functional'>element,</span> conditions
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document to gather the matching ancestor(s) of <code>element</code>.
+See <a href='#getAncestor'><code>getAncestor</code></a> for details on arguments other than “<code>conditions</code>”
+passed to this function, and the return value from this function.</p>
+</p>
+<dl class='params'>
+	<dt><code>conditions</code></dt>
+		<dd>Should be an Object with two properties: <code>data</code> and <code>filter</code>.&nbsp;
+				<code>data</code> should be a “logic-Array,” and <code>filter</code> should be a callback function that
+				decides whether each Element passed to it passes each “condition” of the logic array.&nbsp;
+				See UniDOM’s <a href='#has'><code>has</code></a> function for more info on
+				using filter callback functions with “logic-Arrays”.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='getElementsByComplex'>
+<h4><code>getElementsByComplex(<span class='functional'>element,</span> conditions
+	<span class='optArgs'>[, goDeep [, objFltr [, applyDirect [, powerSelect]]]]</span>)</code></h4>
+<p>Crawls (transverses) the document to gather the matching <code>childNodes</code> of <code>element</code>,
+and possibly recursively their children depending on <code>goDeep</code>.
+See <a href='#getElements'><code>getElements</code></a> for details on arguments other than “<code>conditions</code>”
+passed to this function, and the return value from this function.</p>
+</p>
+<dl class='params'>
+	<dt><code>conditions</code></dt>
+		<dd>Should be an Object with two properties: <code>data</code> and <code>filter</code>.&nbsp;
+				<code>data</code> should be a “logic-Array,” and <code>filter</code> should be a callback function that
+				decides whether each Element passed to it passes each “condition” of the logic array.&nbsp;
+				See UniDOM’s <a href='#has'><code>has</code></a> function for more info on
+				using filter callback functions with “logic-Arrays”.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='hasClass'>
+<h4><code>hasClass(<span class='functional'>element,</span> className <span class='optArgs'>[, logic]</span>)</code></h4>
+<p></p>
+</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element who’s class name to check.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>className</code></dt>
+		<dd>The Element’s className property (similar to its className attribute) is “properly” compared with the
+				<code>className</code> you pass into this function.&nbsp;
+				You may pass in a •String, a •Regular-Expression, a •callback Function, or
+				a •“logic-Array” of Strings, Regular-Expressions, callbacks, and/or more nested “logic-Arrays”.&nbsp;
+				¡Note how <code>hasClass()</code> works differently when using a String compared with
+				<a href='#getElementsByClass'><code>getElementsByClass()</code></a>
+				and <a href='#getAncestorByClass'><code>getAncestorByClass()</code></a>!&nbsp;
+				If you pass in multiple class names as a string with a space,
+				the className property (attribute value) of a matching element must
+				have these class names in the given order, adjacent to each-other.&nbsp; For example, given four elements:
+<code class='example'>&lt;div class='foo bar'&gt;
+&lt;div class='baz foo bar buz'&gt;
+&lt;div class='foo buz bar'&gt;
+&lt;div class='bar foo'&gt;</code>
+				only the first two match <code>hasClass( 'foo bar' )</code><br />
+				but all four match <code>hasClass( ['foo', 'bar'] )</code><br />
+				You can use this fact to style Elements with
+				<acronym title='Cascading Style Sheet'>CSS</acronym> in a similar fashion,
+				but gather them for use by JavaScript<mark class='macronym'>™</mark> in different groups.
+				¡Contrast this with <a href='#getElementsByClass'><code>getElementsByClass()</code></a>
+				and <a href='#getAncestorByClass'><code>getAncestorByClass()</code></a>
+				which convert a single-string with spaces to an Array
+				before internally calling <code>hasClass()</code>!&nbsp; So:
+<code class='example'>getElementsByClass( 'foo bar' ) ≡≡≡ hasClass( ['foo', 'bar'] )
+getElementsByClass( ['foo bar'] ) ≡≡≡ hasClass( 'foo bar' )
+getElementsByClass( ['foo', 'bar'] ) ≡≡≡ hasClass( ['foo', 'bar'] )
+getElementsByClass( ['foo bar', 'buz'] ) ≡≡≡ hasClass( ['foo bar', 'buz'] )  ← matches only the second div in the above example</code>
+				Note that the examples above demonstrate the fact that when <code>className</code> is a “logic-Array,”
+				the Boolean logical relationship between Array members is “and;” that is, all array members must match
+				the Element’s className.&nbsp; You may change this logical relationship between members
+				by setting the “logic” property of this Array, or by passing a value for <code>logic</code> (see below).
+				Given the four <code>&lt;div&gt;</code> elements in the example above,
+<code class='example'>mySub=['baz', 'buz'];
+mySub.logic='xor';
+hasClass(['foo', 'bar', mySub]);</code>
+				Above matches <code>&lt;div class='foo fuq bar buz'&gt;</code>
+				and matches only the third <code>&lt;div&gt;</code> above.
+				See UniDOM’s <a href='#has'><code>has</code></a> function for more info on “logic-Arrays.”<br />
+				In addition to the relational logic in a “logic-Array,” you may also prefix any
+				string you pass in with the ! character for logical “not.”&nbsp;
+				Using the example HTML of 4 <code>&lt;div&gt;</code>s given above,
+				the following example matches only the third <code>&lt;div&gt;</code>:
+				<code>hasClass(['buz', '!baz'])</code>;&nbsp; while
+				<code>hasClass(['foo', 'bar', '!foo bar'])</code> only matches the last two <code>&lt;div&gt;</code>s.&nbsp;
+				Note then how <code>'!foo bar'</code> negates the complete string, not just the first className <code>foo</code>.&nbsp;
+				And finally, any Regular Expression or callback Function that you pass in as a <code>className</code>
+				may have a property, “<code>not</code>,” that will negate its evaluated return value.&nbsp;
+				In the example below, an online restaurant menu may have a section that lets users choose
+				certain food-groups or ingredients that they either prefer or don’t want.&nbsp;
+				You could create one RegExp and toggle its “<code>not</code>” property:
+<code class='example'>
+// high-calibre example:
+
+myViceToAvoid=new RegExp( 'cheese', 'i' );
+myViceToAvoid.not= (UniDOM.getElementsByName(dinner_menu_form, 'cheese').getSelected().value==='no');   // ===true
+myClassnameQuery = [ "dinner", "!Italian", /salad/, myViceToAvoid ];   //pasta and cheese line the gut with paper-maché
+
+// above matches: "dinner Peruvian Andes_salad blackBeans"
+// above matches: "Mexican pintoBeans dinner Acapolco_salad"
+// but not:       "dinner Italian Caesar_salad parmaseanCheese"
+// but not:       "lunch Greek_salad feta_cheese"
+// continuing example:
+
+myClassnameQuery.logic='or'
+
+// above matches: "dinner Peruvian Andes_salad blackBeans"
+// above matches: "Mexican pintoBeans dinner Acapolco_salad"
+// above matches: "dinner Italian Caesar_salad parmaseanCheese"
+// above matches: "lunch Greek_salad feta_cheese"
+// continuing example:
+
+myClassnameQuery.logic='xor'
+
+// no match: "dinner Peruvian Andes_salad blackBeans"
+// no match: "Mexican pintoBeans dinner Acapolco_salad"
+// no match: "dinner Italian Caesar_salad parmaseanCheese"
+// no match: "lunch Greek_salad feta_cheese"
+// above matches: "lunch Italian Greek_salad feta_cheese"
+</code>
+		</dd>
+	<dt><code class='optArgs'>logic</code></dt>
+		<dd>If you pass in a “logic-Array” for the <code>className</code>, you may set its “logic” property
+		by passing it as an optional last argument.&nbsp;
+		This facilitates easy function calling with one step instead of 3:
+<code class='example'>hasClass(['cats', 'dogs'], 'xor');</code>
+&nbsp; vs.
+<code class='example'>var query=['cats', 'dogs'];
+query.logic='xor';
+hasClass(query);</code>
+		</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Returns a Boolean value reflecting the truth of the logic it was passed to evaluate.</p>
+</div>
+</div>
+
+<hr />
+
+<div class='method' id='addClass'>
+<h4><code>addClass(<span class='functional'>element,</span> className)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element who’s class name to add to.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>className</code></dt>
+		<dd>Must be a String of the class-name to add, or an array of these.&nbsp;
+				Each <code>className</code> String is added to <code>element</code>’s className, if it does not exist already.&nbsp;
+				Note this function is indiscriminate when a <code>className</code> String has two or more space-separated class-names,
+				in that it will <strong>not</strong> allow you to add <code>"foo bar"</code> to the existing className
+				<code>"baz foo bar buz"</code>, but you <strong>can</strong> add it to the existing className
+				<code>"bar baz foo buz"</code>.&nbsp; You should instead pass an array: <code>['foo', 'bar']</code>.&nbsp;
+				It also does not check the validity of the <code>className</code> you pass in.&nbsp;
+				This function also automatically cleans extra white-space from the <code>element</code>’s
+				existing/final className.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='removeClass'>
+<h4><code>removeClass(<span class='functional'>element,</span> className)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element who’s class name to remove from.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>className</code></dt>
+		<dd>Must be a String of the class-name to remove, a Regular-Expression to match the class-name to remove,
+				or an array of these.&nbsp;
+				All copies of the <code>className</code> String are removed from the <code>element</code>’s className.&nbsp;
+				Note this function is indiscriminate when a <code>className</code> String has two or more space-separated class-names,
+				in that it <strong>will</strong> allow you to remove <code>"foo bar"</code> from the existing className
+				<code>"baz foo bar buz"</code>, but you <strong>can not</strong> remove it from the existing className
+				<code>"bar baz foo buz"</code>.&nbsp; You should instead pass an array: <code>['foo', 'bar']</code>.&nbsp;
+				This function also automatically cleans extra white-space from the <code>element</code>’s
+				existing/final className.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='useClass'>
+<h4><code>useClass(<span class='functional'>element,</span> className, flag)</code></h4>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element who’s class name is to be modified.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>className</code></dt>
+		<dd>Must be a String or an array of Strings, of the class-name to add or remove (depending on <code>flag</code>).&nbsp;
+				See <a href='#addClass'><code>addClass</code></a> and <a href='#removeClass'><code>removeClass</code></a>
+				for more info, except that note that since the <code>addClass</code> function does not use Regular-Expressions,
+				neither can this one.</dd>
+	<dt><code>flag</code></dt>
+		<dd>Boolean: whether to add (<code>flag=true</code>) or remove (<code>flag=false</code>) the <code>className</code>.</dl>
+</div>
+
+<hr />
+
+<div class='method' id='swapOutClass'>
+<h4><code>swapOutClass(<span class='functional'>element,</span> removals, additions)</code></h4>
+<p>At <em><strong>least</strong></em> one browser I’ve seen will update
+the <acronym title='Document-Object Model'>DOM</acronym> immediately upon changing a className
+as opposed to changing a style-attribute of an Element, which may be postponed
+until the current (event) function is complete.&nbsp;
+So if you remove a class in one statement and add another in the next,
+you still get a “farc-flash” effect displayed to the user.&nbsp;
+Use this for less farc.&nbsp;</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element who’s class name is to be modified.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>removals</code></dt>
+		<dd>See <a href='#removeClass'><code>removeClass</code></a>’ <code>className</code> description.</dd>
+	<dt><code>additions</code></dt>
+		<dd>See <a href='#addClass'><code>addClass</code></a>’ <code>className</code> description.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='disable'>
+<h4><code>disable(<span class='functional'>element,</span> flag <span class='optArgs'>[, className]</span>)</code></h4>
+<p>When you disable/enable a document section, the containing <code>element</code> has the <code>className</code>
+(or its default) added/removed, and its “<code>disabled</code>” property is set to equal <code>flag</code>.&nbsp;
+All descendents of <code>element</code> that can accept user input or keyboard “focus” also have their
+“<code>disabled</code>” property set to equal <code>flag</code>, excepting that
+if you disable a section «A», as well as a sub-section «B» of «A»,
+when you then enable (<code>flag=false</code>) section «A», its sub-section «B» will remain disabled if you
+pass in the same className (or use the default) for both section «A» and its sub-section «B».<p>
+<p>For standards-complient browsers that have the capability (not legacy versions of Micorsoft’s Internet Exploder),
+an <span>“<code>onDisabledStateChange</code>”</span> event is also fired/triggered on the
+<code>element</code> as well as on all of its above-noted user-input descendents.&nbsp;
+The <code>Event</code>-object passed into your <code>onDisabledStateChange</code> handler will have a property
+<span>(<code>event.disable</code>)</span> with a Boolean value corresponding to <code>flag</code>.</p>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element containing the document section to be disabled.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>flag</code></dt>
+		<dd>Boolean: whether to disable (<code>flag=true</code>) or enable (<code>flag=false</code>) this document section.<dd>
+	<dt><code class='optArgs'>className</code></dt>
+		<dd>Must be a String or an array of Strings, of the class-name(s) to add or remove (depending on <code>flag</code>).&nbsp;
+				The default value for <code>className</code> is “<code>disabled</code>”.&nbsp;
+				See <a href='#addClass'><code>addClass</code></a> and <a href='#removeClass'><code>removeClass</code></a>
+				for more info, except that note that since the <code>addClass</code> function does not use Regular-Expressions,
+				neither can this one.</dd>
+</dl>
+</div>
+
+<hr />
+
+<div class='method' id='has'>
+<h4><code>has(<span class='functional'>element,</span> data, filter)</code>
+		<code>Object.has(data, filter)</code>
+		<code>SoftMoon.WebWare.objHas(obj, data, filter)</code></h4>
+<p>UniDOM’s <code>has</code> method is a simple but flexible “logic engine” that allows a programmer
+to write code that can easily create complex, powerful,
+and highly specialized <strong>dynamic</strong> queries in real-time.&nbsp;
+This tool is the heart of all of UniDOM’s query functions/methods.&nbsp;
+But it is flexible enough to work with any JavaScript<mark class='macronym'>™</mark> <code>Object</code>.&nbsp;
+So not only is it available as a function/method to work with the <acronym title='Document-Object Model'>DOM</acronym>,
+it is also available in “raw” form as a static property of the
+JavaScript<mark class='macronym'>™</mark> constructor <code>Object</code>.&nbsp;
+(Note that this is <em>not</em> a property of <code>Object.prototype</code> — don’t confuse this fact.)&nbsp;
+You can use it like this:</p>
+<code class='example'>MyObject={foo: "bar", fi: "buz", fo: "baz", fum: "boz"};
+// this way allows you to do many queries simply:
+MyObject.has=Object.has;
+MyObject.has(data,filter);  //now perform a query on myObject
+// this way allows you to do one query fast:
+Object.has.call(MyObject, data, filter);
+
+myElement=document.getElementById('myElement');
+query_result=UniDOM.has(myElement, data, filter);  //functional style
+query_result=UniDOM(myElement).has(data, filter);  //Object-oriented wrapper style
+// or prototypify the <acronym title='Document-Object Model'>DOM</acronym> at page load
+UniDOM.prototypify();
+query_result=document.getElementById('myElement').has(data, filter);  //prototypical style: makes it simple</code>
+<p>There are many practical examples shown for <a href='#hasClass'><code>hasClass</code></a>
+that demonstrate basic “logic-Arrays.”&nbsp; The UniDOM functions that utilize this “<code>has</code>” method
+accept a “logic-Array” and then use a <code>filter</code> function similar to this one used by
+<a href='#hasClass'><code>hasClass</code></a> shown below:</p>
+<code class='example'>function(e, c)  { //is passed one className in the “logic-Array“ at a time
+var not=false;
+if (typeof c === 'function')  return c(e)^c.not;
+if (typeof c !== 'object'  ||  !(c instanceof RegExp))  {
+	if (typeof c == 'string'  &&  c.charAt(0)==='!')  {c=c.substr(1);  not=true;}
+	c=new RegExp('\\b'+c+'\\b');  }
+return (not  ||  c.not)  ?  (e.className.match(c)===null) : e.className.match(c);  }</code>
+<dl class='params'>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element to query.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus 1 optional argument),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code>data</code></dt>
+		<dd>A random-length “logic-Array” of a user-defined set of “conditions” to be met.&nbsp;
+				Data members that have a “logic” property should be Arrays that are considered a sub-set of conditions;
+				and this is recursive, so you may have deeply nested sub-set “logic-Arrays.”&nbsp;
+				The “logic” property may be any of the following (strings)
+				(<code>'and'</code> is default if no “logic” property is defined):
+				<code class='example'>'and'  'or'  'nor'  'not'  'nand'  'xor'  'xnor'  'xnot'</code>
+				(“nor” and “not” have the same logical meaning)&nbsp;
+				Note that these logical operators take on a slightly new, expanded meaning, as they can operate
+				on multiple values, not only two.&nbsp; For example:
+				<code class='example'>([false, true, true]).logic='or'   // logic-Array evaluates to true
+([false, true, true]).logic='xor'  // logic-Array evaluates to false
+([false, true, true]).logic='and'  // logic-Array evaluates to false
+([false, true, true]).logic='xnor' // logic-Array evaluates to false
+([false, true, true]).logic='nand' // logic-Array evaluates to true
+([false, true, true]).logic='not'  // logic-Array evaluates to false
+([false, true, true]).logic='xnot' // logic-Array evaluates to true</code></dd>
+	<dt><code>filter</code></dt>
+		<dd>Your filtering function should accept the arguments: <code>filter(obj, query_condition)</code>
+				and should return <code>true</code> if “query_condition” is met, <code>false</code> if not.&nbsp;
+				The <code>filter</code> function receives the Object that UniDOM’s <code>has</code> is applied as a method of
+				(either the <acronym title='Document-Object Model'>DOM</acronym> Element or a user-Object)
+				as the first argument, and individually each of
+				the members of the <code>data</code> “logic-Array,” excepting if any of these members is itself (recursively)
+				a sub-set “logic-Array,” its individual members will each be passed to the <code>filter</code> function.
+		</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>Returns a Boolean value reflecting the truth of the logic it was passed to evaluate.</p>
+</div>
+</div>
+
+<hr />
+
+<h3>Utilizing your results</h3>
+
+
+<div class='method' id='objectify'>
+<h4><code><span class='optArgs'>objFltr</span></code>
+	<code>objectify(filter <span class='optArgs'>[, applyDirect [, powerSelect]]</span>)</code>
+	<code>Array.objectify(filter)</code>
+	<code>SoftMoon.WebWare.objectifyArray(arr, filter)</code></h4>
+<p>For functions/methods that return <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>s
+(really just a simple Array with some standard methods &amp; properties tacked on),
+additional “named” properties may be added to the Array, holding members of the Array for quick access in the future
+without having to know which Array-member (integer) contains the needed element(s).
+If the <code>filter</code> (a.k.a. <code>objFltr</code>) callback Function returns the
+same property name for two or more elements in the Array,
+the property will then hold another UniDOM.ElementWrapperArray containing the multiple elements.</p>
+<code class='example'>==== example:
+// first we pass in an “objFltr” directly through the “getElementsByClass” method →      ↓
+myElementsArray = UniDOM.getElementsByClass(myPageSectionElement, /^my...Blocks/ , true, function(e) {return e.className.match( /_(.+)$/ )[1];} );
+// then we further “objectify” the “UniDOM.ElementWrapperArray” with a second “filter”
+myElementsArray._.objectify( function(e) {return e.className.match( /my(...)Blocks/ )[1];} );
+// myElementArray results might return something like this Array-Object
+(note it IS a real JavaScript<mark class='macronym'>™</mark> Array):
+{
+ [0] → &lt;div id='b0' class='mySqrBlocks _red'&gt;
+ [1] → &lt;div id='b1' class='mySqrBlocks _green'&gt;
+ [2] → &lt;div id='b2' class='mySqrBlocks _blue'&gt;
+ [3] → &lt;div id='b3' class='mySqrBlocks _yellow'&gt;
+ [4] → &lt;div id='b4' class='myTriBlocks _blue'&gt;
+ [5] → &lt;div id='b5' class='myTriBlocks _green'&gt;
+ [6] → &lt;div id='b6' class='myLogBlocks _green'&gt;
+ [7] → &lt;div id='b7' class='myLogBlocks _blue'&gt;
+ [length] → 8
+ [_] → the “UniDOM power methods” object for this Array
+ [red]    → &lt;div id='b0' class='mySqrBlocks _red'&gt;
+ [green]  → [ &lt;div id='b1' class='mySqrBlocks _green'&gt; , &lt;div id='b5' class='myTriBlocks _green'&gt; , &lt;div id='b6' class='myLogBlocks _green'&gt; ] ← the “power methods” for this Array are also available through its Array._
+ [blue]   → [ &lt;div id='b2' class='mySqrBlocks _blue'&gt; , &lt;div id='b4' class='myTriBlocks _blue'&gt; , &lt;div id='b7' class='myLogBlocks _blue'&gt; ]  ← the “power methods” for this Array are also available through its Array._
+ [yellow] → &lt;div id='b3' class='mySqrBlocks _yellow'&gt;
+ [Sqr]    → [ &lt;div id='b0' class='mySqrBlocks _red'&gt; , &lt;div id='b1' class='mySqrBlocks _green'&gt; , &lt;div id='b2' class='mySqrBlocks _blue'&gt; , &lt;div id='b3' class='mySqrBlocks _yellow'&gt; ]
+ [Tri]    → [ &lt;div id='b4' class='myTriBlocks _blue'&gt; , &lt;div id='b5' class='myTriBlocks _green'&gt; ]
+ [Log]    → [ &lt;div id='b6' class='myLogBlocks _green'&gt; , &lt;div id='b7' class='myLogBlocks _blue'&gt; ]
+}</code>
+<p>But it is flexible enough to work with any JavaScript<mark class='macronym'>™</mark> <code>Array</code>.&nbsp;
+So not only is it available as a function/method to work with <acronym title='Document-Object Model'>DOM</acronym> query results,
+it is also available in “raw” form as a static property of the
+JavaScript<mark class='macronym'>™</mark> constructor <code>Array</code>.&nbsp;
+(Note that this is <em>not</em> a property of <code>Array.prototype</code> — don’t confuse this fact.)&nbsp;
+You can use it like this:</p>
+<code class='example'>myArray=["bar", "buz", "baz", "boz"];
+Array.objectify.call(myArray, filter);
+//or if it better suits your coding style and/or needs:
+myArray.objectify=Array.objectify; //do this once…
+myArray.objectify(filter);        // do this as many times as you need with different filters.
+</code>
+<dl>
+	<dt><code>arr</code></dt>
+		<dd>The array to objectify.</dd>
+	<dt><code class='optArgs'>objFltr</code><br />
+			<code>filter</code></dt>
+		<dd>Pass in a callback-function as the <code>filter</code> (a.k.a. <code>objFltr</code>) which should return
+				a property-name (¡numerical values may override existing array members!)
+				for the element passed into the callback,
+				to be added as an Object-property to the finally-returned Array.&nbsp;
+				¡¡¡&nbsp;the returned Array may have nonstandard properties added to
+				&lt;select&gt; elements if you pass “true” for <code>powerSelect</code>&nbsp;!!!&nbsp;
+				Each added property usually reflects a single member of the returned Array.&nbsp;
+				If the <code>filter</code> callback returns the same name for multiple elements in the returned Array,
+				the added property will be a sub- Array of elements, each reflecting a member of the overall returned Array.
+		<dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply “power methods” directly to sub-arrays
+				when multiple elements share the same property name?&nbsp;
+				See the <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a> constructor.</dd>
+	<dt><code class='optArgs'>powerSelect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply nonstandard methods (<code>getSelected()</code> &amp; <code>setSelected()</code>)
+				to <code>&lt;select&gt;</code> elements?&nbsp;
+				See: <a href='#powerSelect'><code>powerSelect</code></a>.</dd>
+</dl>
+</div><!--  close  objectify  -->
+
+<hr />
+
+<div class='method' id='powerSelect'>
+<h4><code><span class='optArgs'>powerSelect</span></code>
+	<code>getSelected(<span class='optArgs'>forceReturnArray</span>)</code>
+	<code>setSelected(value)</code>
+	<code>UniDOM.addPowerSelect(select)</code>
+	<code>UniDOM.getSelectedOptions(select <span class='optArgs'>[, forceReturnArray]</span>)</code>
+	<code>UniDOM.setSelectedOptions(select, value)</code>
+	<code>UniDOM.powerSelect=true</code></h4>
+<p>When using UniDOM’s “element-gathering” functions/methods that return
+<a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>s
+(really just a simple Array with some standard methods &amp; properties tacked on),
+or when using the <a href='#objectify'><code>objectify</code></a> method,
+you may pass in a final optional Boolean argument “<code>powerSelect</code>”
+which will add nonstandard methods (<code>getSelected()</code> &amp; <code>setSelected()</code>) directly to
+<code>&lt;select&gt;</code> elements.&nbsp;
+These methods mirror the same methods that are found on the returned
+<a href='#ElementWrapperArray'><code>ElementWrapperArray</code></a>s.&nbsp;
+You can then write code that can get/set either a <code>&lt;select&gt;</code>
+or a group of <code>&lt;input&gt;</code>s in a UniDOM.ElementWrapperArray
+without worrying about if the form-format may change a little in the future, giving more flexibility to the HTML developer.
+Consider an online menu where users can choose one large side item and one small side item:</p>
+
+<code class='example'>==== example:   name of the element(s) that match ↓            ↓deep  ↓ returns “objectify” property names      applyDirect↓      ↓powerSelect
+&nbsp; sideOrders = UniDOM.getElementsByName(myMenu,  /sideOrders/, true,  function(e) {return e.name.match( /\[(.+)\]/ )[1]},  true,  true)
+&nbsp; largeSide = sideOrders.large.getSelected().value;
+&nbsp; smallSide = sideOrders.small.getSelected().value;</code>
+
+<p>May return something like:</p>
+
+<code class='example'>&nbsp; sideOrders =
+&nbsp;{  //Array-Object: a UniDOM.ElementWrapperArray ← also has standard “power methods” “applied directly” (too many to list)
+&nbsp; [0] → &lt;input type='radio' name='sideOrders[large]' value='baked potato with cheese' /&gt;
+&nbsp; [1] → &lt;input type='radio' name='sideOrders[large]' value='cheesy broccoli' /&gt;
+&nbsp; [2] → &lt;input type='radio' name='sideOrders[large]' value='vegi-baked beans with cheese' /&gt;
+&nbsp; [3] → &lt;input type='radio' name='sideOrders[large]' value='Greek salad' checked='checked'/&gt;
+&nbsp; [4] → &lt;select name='sideOrders[small]'&gt;  ← has options (these options are NOT “in” this array):
+&nbsp;         &lt;option value='snow peas' selected='selected'&gt;
+&nbsp;         &lt;option value='string beans'&gt;
+&nbsp;         &lt;option value='creamed corn'&gt;
+&nbsp; [length] → 5
+&nbsp; [_] → the “power methods” object for this Array - they are also “applied directly,” but they are not shown here for space limitations
+&nbsp; [large] → {  //Array-Object: a UniDOM.ElementWrapperArray  ← also has standard “power methods” “applied directly” (too many to list)
+&nbsp;            [0] → &lt;input type='radio' name='sideOrders[large]' value='baked potato with cheese' /&gt;
+&nbsp;            [1] → &lt;input type='radio' name='sideOrders[large]' value='cheesy broccoli' /&gt;
+&nbsp;            [2] → &lt;input type='radio' name='sideOrders[large]' value='vegi-baked beans with cheese' /&gt;
+&nbsp;            [3] → &lt;input type='radio' name='sideOrders[large]' value='Greek salad' checked='checked'/&gt;
+&nbsp;            [length] → 4
+&nbsp;            [_] → the “power methods” object for this Array
+&nbsp;           }
+&nbsp; [small] → &lt;select name='sideOrders[small]'&gt;  ← has options (these options are NOT “in” this array):
+&nbsp;            &lt;option value='snow peas' selected='selected'&gt;
+&nbsp;            &lt;option value='string beans'&gt;
+&nbsp;            &lt;option value='creamed corn'&gt;
+&nbsp;}
+
+&nbsp; largeSide='Greek salad'
+&nbsp; smallSide='snow peas'</code>
+
+<p>Now we can develop an online-menu manager software-package that allows restaurant managers to manage their menu
+which may change daily based on locally available ingredients or the chef’s specials, etc.&nbsp;
+The restaurant manager can choose a <code>&lt;select&gt;</code>
+or list of <code>&lt;input&gt;</code>s for the ingredients or menu items,
+and the high-end JavaScript<mark class='macronym'>™</mark>
+logic that puts together a customer’s order need not worry about the form’s format.&nbsp;
+How's that go?……write less, do more…  …</p>
+<p>Also provided, the <code>UniDOM.addPowerSelect()</code> function will add nonstandard methods
+<code>getSelected()</code> &amp; <code>setSelected()</code> directly to <code>&lt;select&gt;</code> elements;&nbsp;
+and the static functions <code>UniDOM.getSelectedOptions()</code> &amp; <code>UniDOM.setSelectedOptions()</code>
+are available if you don’t want to tarnish the <acronym title='Document-Object Model'>DOM</acronym>.</p>
+<dl>
+	<dt><code class='optArgs'>powerSelect</code></dt>
+		<dd>(The final optional argument passed into UniDOM’s “element-gathering” (and other) methods.)&nbsp;
+		Boolean: ¿Add nonstandard methods (<code>getSelected()</code> &amp; <code>setSelected()</code>)
+		to <code>&lt;select&gt;</code> elements?</dd>
+	<dt><code class='optArgs'>forceReturnArray</code></dt>
+		<dd>Boolean.&nbsp;
+		The <code>getSelected</code> methods by default will return a single <code>&lt;input type='radio'&gt;</code> element
+		from a <code>UniDOM.ElementWrapperArray</code>, or a single <code>&lt;option&gt;</code> element
+		from a <code>&lt;select&gt;</code>-one field.&nbsp;
+		In opposition, by default it will return an Array of one or more <code>&lt;input type='checkbox'&gt;</code> elements,
+		or an Array of one or more <code>&lt;option&gt;</code> elements from a <code>&lt;select&gt;</code>-multiple field.&nbsp;
+		By default it will return <code>null</code> if there are none <code>checked</code> or <code>selected</code>.&nbsp;
+		By passing a Boolean value for <code>forceReturnArray</code> you may override these defaults:&nbsp;
+		passing <code>true</code> will always return an array, with zero, one, or more elements as members;
+		and passing <code>false</code> will return <em><strong>only one element</strong></em> (no Array)
+		<em><strong>if only one</strong></em> is <code>checked</code> or <code>selected</code>.&nbsp;
+		</dd>
+	<dt><code>value</code></dt>
+		<dd>String or an Array of Strings.&nbsp;
+		Any <code>&lt;input&gt;</code> or <code>&lt;option&gt;</code> (of a <code>UniDOM.ElementWrapperArray</code> or
+		<code>&lt;select&gt;</code> element) with a value attribute,
+		or the text of an <code>&lt;option&gt;</code>, that matches the <code>value</code>
+		(or if <code>value</code> is an Array, one of its members)
+		you pass into the <code>setSelected()</code> method will be <code>checked</code> or <code>selected</code>.</dd>
+	<dt><code>select</code></dt>
+		<dd>The <code>&lt;select&gt;</code> element you want to empower with
+		<code>getSelected()</code> &amp; <code>setSelected()</code> methods.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>See <code>forceReturnArray</code> above for details on the return value for <code>getSelected</code> methods.&nbsp;
+There is no return value for the other methods.</p>
+</div>
+<br /><!-- ouch! -->
+<div class='related properties' id='powerSelect_properties'><h5>Related Properties:</h5>
+<p>You can add UniDOM’s power methods <code>getSelected()</code> &amp; <code>setSelected()</code>
+to all <code>&lt;select&gt;</code> elements <em><strong>that UniDOM gathers</strong></em>
+by setting UniDOM’s global flag: <code>UniDOM.powerSelect=true</code>.&nbsp;
+You then never need to pass in a flag for <code>powerSelect</code> as the final (optional) argument
+to UniDOM’s element-gathering methods.</p>
+</div>
+</div><!--  close  powerSelect  -->
+
+<hr />
+
+<h3>UniDOM’s Element Wrappers for <acronym>OO</acronym> style code</h3>
+
+<div class='instance' id='ElementWrapper'>
+<h4><code>UniDOM.ElementWrapper(element <span class='optArgs'>[, applyDirect]</span>)</code>
+	Object instances</h4>
+<p>A <code>UniDOM.ElementWrapper</code> is simply a shell-wrapper for
+a <acronym title='Document-Object Model'>DOM</acronym> element.&nbsp;
+This wrapper has all the relevent UniDOM methods to work on the given element.&nbsp;
+In this way, you can write Object-oriented code without modifying the
+<acronym title='Document-Object Model'>DOM</acronym>’s prototypes,
+and you can “chain” a UniDOM method on to the results of the previous method.</p>
+<p>Note you can create a new wrapper using:
+<code>myWrapper=new UniDOM.ElementWrapper(myElement)</code> but it may be easier
+to simply use the basic functional interface:
+<code>myWrapper=UniDOM(myElement)</code> which will return the same new <code>ElementWrapper</code>.&nbsp;
+You can always check an unknown value using <code>(unknown instanceof UniDOM.ElementWrapper)</code>.</p>
+<dl>
+	<dt><code>element</code></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> element you want to wrap with UniDOM’s power methods.</dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean: this flag does not affect the <code>ElementWrapper</code>, rather
+		it is passed on automatically to any of UniDOM’s power methods that are called
+		on this wrapper, and when they return a <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>
+		this <code>applyDirect</code> flag will affect whether UniDOM’s power methods
+		will be added directly to the said returned <code>ElementWrapperArray</code>.&nbsp;
+		See <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a> for more details.</dd>
+</dl>
+<div class='properties'><h5>Instance Properties:</h5>
+<dl>
+	<dt><code>element</code></dt>
+		<dd><p>Boolean: this property mirrors the same-named argument passed into the
+		<code>ElementWrapper</code> constructor.</p></dd>
+	<dt><code>applyDirect</code></dt>
+		<dd><p>Boolean: this property mirrors the same-named argument passed into the
+		<code>ElementWrapper</code> constructor.</p></dd>
+</dl>
+</div>
+<br /><!-- ouch! -->
+<div class='method properties'><h5>Instance Methods</h5>
+<p>An <code>ElementWrapper</code> has all the standard relevent	UniDOM “power-methods.”</p>
+<ul>
+<li>$</li>
+<li>addEventHandler</li>
+<li>removeEventHandler</li>
+<li>removeAllEventHandlers</li>
+<li>generateEvent</li>
+<li>triggerEvent</li>
+<li>getMouseOffset</li>
+<li>getOffset</li>
+<li>getAncestor</li>
+<li>getElements</li>
+<li>getElders</li>
+<li>getJuniors</li>
+<li>getElementsByName</li>
+<li>getElementsByClass</li>
+<li>getAncestorByClass</li>
+<li>getElementsByComplex</li>
+<li>getAncestorByComplex</li>
+<li>hasAncestor</li>
+<li>hasElement</li>
+<li>has</li>
+<li>hasClass</li>
+<li>addClass</li>
+<li>removeClass</li>
+<li>useClass</li>
+<li>swapOutClass</li>
+<li>disable</li>
+<li>getSelected</li>
+<li>setSelected</li>
+</ul>
+</div>
+</div><!-- close  ElementWrapper  -->
+
+<hr />
+
+<div class='instance' id='ElementWrapperArray'>
+<h4><code>UniDOM.ElementWrapperArray(<span class='optArgs'>[wrapElements [, applyDirect]]</span>)</code>
+	<span class='comment'>↑ a new Array will be created with the relevant “power methods”</span>
+	<code>UniDOM.ElementWrapperArray(userArray <span class='optArgs'>[, wrapElements [, applyDirect]]</span>)</code>
+	<span class='comment'>↑ the userArray will have the relevant “power methods” added to it</span>
+	Object instances</h4>
+<p>UniDOM’s <code>ElementWrapperArray</code>s are simply a basic
+JavaScript<mark class='macronym'>™</mark> <code>Array</code> with
+UniDOM power methods and relevent properties tacked on.&nbsp;
+These methods and properties are not prototyped to the <code>Array</code>
+(there is no way to do that without affecting <strong><em>all</em></strong>
+JavaScript<mark class='macronym'>™</mark> arrays,
+and creating custom Object instances can not duplicate the inherent functionality of the
+<code>Array.length</code> property).&nbsp;
+UniDOM always uses real JavaScript<mark class='macronym'>™</mark> <code>Array</code>s
+instead of <code>Object</code> instances that “hide away” the actual element members.&nbsp;
+(UniDOM is oriented toward flexibility for programmers, rather than merely simplicity for less-technical developers.)
+We want to manipulate the <code>Array</code> as an array, rather than being <em><strong>required</strong></em> to use
+<code>add()</code> and <code>remove()</code> and <code>getArray()</code> methods.&nbsp;
+We can keep track of what we add, where, when, why, and how, and may want to hack the contents.</p>
+<p>Since these are real JavaScript<mark class='macronym'>™</mark> <code>Array</code>s
+(to keep the inherent length-property-functionality which can not be fully simulated),
+and we can not prototype the “power-methods” into a new <code>UniDOM.ElementWrapperArray</code>,
+they are available through the “<code>_</code>” property of the <code>ElementWrapperArray</code>.
+If you want to access these methods directly through the <code>Array</code>,
+the “power methods” must be individually copied to the new <code>Array</code>, a burden on the processor.&nbsp;
+This is not a big problem with fast modern computers, but may be on older ones in code-loops.&nbsp;
+See the <code>applyDirect</code> argument flag and the static <code>ElementWrapperArray.applyDirect</code> flag.</p>
+<p>Do note that the above-mentioned “<code>_</code>” property of the <code>ElementWrapperArray</code>
+is itself an <code>Object</code> instance, and has a property referring back to the <code>ElementWrapperArray</code>,
+and is therefore custom-made and not simply transferable.</p>
+<p>Also note that the UniDOM “power-methods” that generally return more
+than one <acronym title='Document-Object Model'>DOM</acronym> element
+return them in an <code>ElementWrapperArray</code>.&nbsp;
+These “power-methods” automatically determine the value of <code>wrapElements</code>
+(depending on the coding style you are using),
+but you may pass through them a value for <code>applyDirect</code>.</p>
+<dl>
+	<dt><code class='optArgs'>wrapElements</code></dt>
+		<dd>Boolean:&nbsp;
+		Whether the <code>Array</code> members are “wrapped” in
+		<a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>s,
+		or if they are simply “raw” <acronym title='Document-Object Model'>DOM</acronym> elements.&nbsp;
+		Each member in the <code>userArray</code> and those added to the returned Array should be a
+		<acronym title='Document-Object Model'>DOM</acronym> <code>Element</code> or a
+		<code>UniDOM.ElementWrapper</code> according to <code>wrapElements</code>.&nbsp;
+		Power-methods of this <code>ElementWrapperArray</code> that return
+		or add <acronym title='Document-Object Model'>DOM</acronym> Elements
+		will then respect the <code>wrappedElements</code> flag property, and treat the <code>ElementWrapperArray</code>
+		members accordingly.</dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean:&nbsp;
+	  Whether to apply the “power methods” directly to this <code>UniDOM.ElementWrapperArray</code>
+		(really just a simple Array with some standard properties tacked on).&nbsp;
+		They are always available through its “<code>_</code>” property.
+<code class='example'>==== example:
+&nbsp; myInputs=UniDOM.getElementsByClass(myForm, 'sideOrders')
+&nbsp; myInputs._.setSelected(['potato', 'peas']);                          ← note the use of the ._. object to hold the methods
+==== example:                                                          ↓ applyDirect
+&nbsp; myInputs=UniDOM.getElementsByClass(myForm, 'sideOrders', true, null, true)
+&nbsp; myInputs.setSelected(['potato', 'peas']);                            ← note now we don’t need the ._. object</code></dd>
+</dl>
+<div class='static properties'><h5>Static Properties &amp; Constructor</h5>
+<p>The default action of <strong><em>not</em></strong> applying “power-methods” directly to the
+<code>ElementWrapperArray</code> can be overridden by changing
+the static value of: <code>UniDOM.ElementWrapperArray.applyDirect</code></p>
+<code class='example'>==== example:
+&nbsp; UniDOM.ElementWrapperArray.applyDirect=true;
+&nbsp; myInputs=UniDOM.getElementsByClass(myForm, 'sideOrders')
+&nbsp; myInputs.setSelected(['potato', 'peas']);</code>
+<p>It would usually be OK to always apply direct,
+but if your program repeatedly and extensively loops through UniDOM methods that return
+<code>ElementWrapperArray</code>s, it may noticeably slow the process.</p>
+<p>Likewise, the default type of <code>Array</code> member is a
+<acronym title='Document-Object Model'>DOM</acronym> element.&nbsp;
+This may be overridden by setting the static value of: <code>UniDOM.ElementWrapperArray.wrappedElements=true</code>
+to signify the use of <a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>s
+(containing the <acronym title='Document-Object Model'>DOM</acronym> elements) instead of the
+“raw” <acronym title='Document-Object Model'>DOM</acronym> elements by themselves.&nbsp;
+Note <code>ElementWrapper</code>s allow you to use UniDOM’s power methods on each individual
+<code>ElementWrapperArray</code> member, not only on the <code>Array</code> (which would affect all members).<p>
+<p>The <code>UniDOM.ElementWrapperArray.dfltMethods</code> constructor is used
+to create instances of the “power-method” objects attached to instances of
+<code>ElementWrapperArray</code>s as the <span>“<code>_</code>”</span> property.&nbsp;
+You may add to or otherwise modify it for additional methods, etc., to work on the <code>ElementWrapperArray</code>,
+but be sure you understand how to access the array within your newly added methods.</p>
+</div>
+<br /><!-- ouch! -->
+<div class='properties'><h5>Instance Properties</h5>
+<dl>
+	<dt><code>_</code></dt>
+		<dd><p>This property holds all the relevent “power-methods” for the <code>ElementWrapperArray</code>.&nbsp;
+		It is always available, even when the methods are also “applied directly.”&nbsp;
+		See <code>applyDirect</code> above.</p></dd>
+	<dt><code>wrappedElements</code></dt>
+		<dd><p>Boolean: this property mirrors the <code>wrapElements</code> argument passed into the
+		<code>ElementWrapperArray</code> constructor, or the corresponding default value.</p></dd>
+	<dt><code>EWAMAppliedDirect</code></dt>
+		<dd><p>Boolean: this property mirrors the <code>applyDirect</code> argument passed into the
+		<code>ElementWrapperArray</code> constructor, or the corresponding default value.&nbsp;
+		(EWAMAppliedDirect stands for “Element Wrapper Array Methods Applied Directly”).</p></dd>
+</dl>
+</div>
+<br /><!-- ouch! -->
+<div class='method properties'><h5>Instance Methods</h5>
+<p>An <code>ElementWrapperArray</code> has all the standard relevent UniDOM “power-methods”
+for working with the <acronym title='Document-Object Model'>DOM</acronym>
+(available either through its “<code>_</code>” property or directly — see <code>applyDirect</code> above),
+plus a few additional methods specifically for working with <code>Array</code>s of elements.&nbsp;
+See <a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a> for details on the standard “power-methods.”</p>
+<h6>Additional methods specific to <code>ElementWrapperArray</code>s:</h6>
+<dl>
+	<dt><code>objectify(filter <span class='optArgs'>[, applyDirect [, powerSelect]]</span>)</code></dt>
+		<dd><p>Adds properties to the array defined by the <code>filter</code> callback function.&nbsp;
+		See the section specific to <a href='#objectify'><code>objectify</code></a>.</p></dd>
+	<dt><code>wrap(<span class='optArgs'>[flag]</span>)</code></dt>
+		<dd><p>Sets the <code>wrappedElements</code> property.&nbsp;
+		Useful when chaining without wasting processor time wrapping intermediate results:
+		given an <code>ElementWrapperArray</code> of “raw” (unwrapped) Elements:</p>
+		<code class='example'>====Example:  we can now chain on an individual ↓
+&nbsp;myEWA.getElements(…).map(…).wrap().filter(…)[1].disable(…)</code>
+		<p>¡Note <code>wrap()</code> and <code>raw()</code> do not modify the existing Array members,
+		only the results of the next method in the chain!</p></dd>
+	<dt><code>raw(<span class='optArgs'>[flag]</span>)</code></dt>
+		<dd><p>Sets the <code>wrappedElements</code> property.&nbsp;
+		Useful when chaining on elements, while delivering a clean array:&nbsp;
+		given an individual <code>ElementWrapper</code> (<code>myEW</code> in the example below),
+		chaining creates an Array of <code>ElementWrappers</code>
+		… until <code>raw()</code> is called.</p>
+		<code class='example'>element=myEW.getAncestor(…)[1].getElements(…).raw().filter(…)</code>
+		<p>¡Note <code>wrap()</code> and <code>raw()</code> do not modify the existing Array members,
+		only the results of the next method in the chain!</p></dd>
+	<dt><code>add()</code></dt>
+		<dd><p>This method takes any number of arguments,
+		each either a <acronym title='Document-Object Model'>DOM</acronym> element
+		or a <a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>,
+		and adds them to the existing <code>ElementWrapperArray</code>.&nbsp;
+		It wraps or unwraps the arguments you pass in depending on the
+		<span><code>ElementWrapperArray</code>’s</span>
+		<code>wrappedElements</code> property flag.</dd>
+	<dt><code>map(cb <span class='optArgs'>[, o [, wrap [, applyDirect]]]</span>)</code></dt>
+		<dd><p>This method works just like the standard <code>Array.map()</code> method,
+		(with the <code>cb()</code> function’s return values
+		becoming the members of the new Array returned by <code>map()</code>)
+		except with the optional extra arguments specific to UniDOM’s functioning.&nbsp;
+		If <code>wrap</code> is Boolean <code>true</code> then the resulting mapped-Array will be
+		a <code>UniDOM.ElementWrapperArray</code>, and the <code>applyDirect</code> flag will then
+		affect this new <code>ElementWrapperArray</code>.</p></dd>
+	<dt><code>filter(cb <span class='optArgs'>[, o]</span>)</code></dt>
+		<dd><p>This method works just like a standard <code>Array.filter()</code> method,
+		(passing each array member to the <code>cb()</code> function who’s Boolean return values
+		determine the members of the original Array included in the new Array returned by <code>filter()</code>)
+		except that the returned Array is a <code>UniDOM.ElementWrapperArray</code>.&nbsp;
+		If you pass an Object for <code>o</code>, <code>cb</code> will be invoked on that Object.</dd>
+</dl>
+</div>
+</div><!-- close  ElementWrapperArray  -->
+
+<hr />
+
+<div class='method' id='UniDOM'><h4><code>UniDOM(element <span class='optArgs'>[, applyDirect]</span>)</code>
+<code>UniDOM(ElementWrapper <span class='optArgs'>[, applyDirect]</span>)</code>
+<code>UniDOM(CSSQueryString <span class='optArgs'>[, applyDirect]</span>)</code>
+<span class='comment'>↑ the third argument, <code>passData</code>, must be <code>==false</code> (or <code>undefined</code>)</span>
+<code>UniDOM(element‖ElementWrapper, CSSQueryString <span class='optArgs'>[, applyDirect]</span>)</code>
+<code>UniDOM(eArray <span class='optArgs'>[, applyDirect [, passData]]</span>)</code>
+<code>UniDOM(element‖ElementWrapper‖eArray‖userData, applyDirect, passData=true)</code></h4>
+<p>The basic <code>UniDOM()</code> function is a catch-all for creating
+<a href='#ElementWrapper'><code>ElementWrapper</code></a>s with UniDOM’s “power-methods”
+to work on your chosen <acronym title='Document-Object Model'>DOM</acronym> element(s).&nbsp;
+It is the basis for using the “<a href='#wrapperStyle'>wrapper-based Object-oriented programming style</a>.”&nbsp;
+In this respect, it is similar in function to jQuery’s “<code>$</code>”.&nbsp;
+However in contrast, note UniDOM’s “<a href='#dollarSign'><code>$</code></a>”
+function <em><strong>only</strong></em> acts as a <acronym title='Cascading Style Sheet'>CSS</acronym>-selector-query
+Engine without “wrapping” the gathered elements.</p>
+<dl>
+	<dt><code>element</code></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> element you want to wrap with UniDOM’s
+		<a href='#ElementWrapper'><code>ElementWrapper</code></a> power methods.</dd>
+	<dt><code>ElementWrapper</code></dt>
+		<dd>The <a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a> containing the
+		<acronym title='Document-Object Model'>DOM</acronym> element you want to “re-wrap” with UniDOM’s power methods.&nbsp;
+		(note technically “wrappers” are just Objects that “point” to the element,
+		and only give the illusion of “wrapping-around,” so you may have as many <code>ElementWrappers</code>
+		pointing to a single element as you want, and none will be “wrapped-around” interfering with another)</dd>
+	<dt><code>CSSQueryString</code></dt>
+		<dd>A Cascading-Style-Sheet category of a query-string to gather
+		<acronym title='Document-Object Model'>DOM</acronym> elements
+		that will each be individually wrapped with <a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>s,
+		and collected in a <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>.&nbsp;
+		See UniDOM’s “<a href='#CSSEngine'><code>$</code></a>” function for more info.&nbsp;
+		¡Note that you may <strong><em>not</em></strong> pass <code>true</code>
+		for the <code>passData</code> argument (see below) if you want to use this query-string
+		as the first argument!</dd>
+	<dt><code>eArray</code></dt>
+		<dd>An Array that may contain any number of legal arguments for the first value
+		passed to this UniDOM function including nested Arrays.&nbsp;
+		Each member (recursively) will be “wrapped” in <a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>s,
+		and the group of them will be returned in one (or more when nested)
+		<a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>(s).</dd>
+	<dt><code>userData</code></dt>
+		<dd>Any type of data may be passed through the <code>UniDOM()</code> function when its
+		<code>passData</code> argument is <code>true</code>.&nbsp;
+		See <code>passData</code> below.</dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean: this flag does not affect the <a href='#ElementWrapper'><code>ElementWrapper</code></a>
+		created with <code>UniDOM()</code>,
+		rather it is passed on automatically to any of UniDOM’s power methods that are called
+		on the wrapper, and when they return a <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a>
+		this <code>applyDirect</code> flag will affect whether UniDOM’s power methods
+		will be added directly to the said returned <code>ElementWrapperArray</code>.&nbsp;
+		See <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a> for more details.</dd>
+	<dt><code class='optArgs'>passData</code></dt>
+		<dd>This argument is used internally by UniDOM’s
+		<a href='#ElementWrapperArray'><code>ElementWrapperArray</code></a> “power-methods”
+		to pass raw data returned by the methods through the <code>UniDOM()</code> function without
+		error or confusion of data-type.&nbsp;
+		There is generally no reason for you to need to use it; however if you
+		want to play “hackey-sack” with it, go ahead…&nbsp;
+		Passing <code>true</code> for this argument will still “wrap” elements,
+		“rewrap” existing <code>ElementWrapper</code>s, and array members of these two former;
+		and this <code>passData</code> value will be simply ignored in those cases.&nbsp;
+		In contrast, when <span><code>passData=true</code>,</span> passing a String for the first argument will simply
+		return the string as user-data instead of treating the string as a
+		<acronym title='Cascading Style Sheet'>CSS</acronym> selector to gather elements;&nbsp;
+		and as well, passing through any other variable-type for the first argument
+		is simply passed back instead of throwing an Error.</dd>
+</dl>
+</div><!--  close  UniDOM()  -->
+
+<hr />
+
+<h3>DOM queries with <acronym title='Cascading Style Sheet'>CSS</acronym> selectors</h3>
+
+<div class='method' id='CSSEngine'>
+<h4><code>$(CSSQueryString <span class='functional'>, element</span> <span class='optArgs'>[, objFltr [, applyDirect [, powerSelect]]]</span>)</code></h4>
+<p>UniDOM’s “dollar–sign” function/method <code>$</code> integrates UniDOM’s total functionality with
+the “<acronym title='Cascading Style Sheet'>CSS</acronym>-Engine” of your choice.&nbsp;
+UniDOM does not have an Engine of its own
+(but given enough free time I plan on writing one that utilizes UniDOM’s powerful
+<span>“<code>has</code>”</span> method)
+but it will automatically use the standard
+JavaScript<mark class='macronym'>™</mark>—<aacronym>DOM</acronym> interface method
+<code>querySelectorAll</code> if it is available,
+or else look for “Sizzle” (jQuery’s Engine) or “Slick” (MooTools’ Engine)
+(see: <a href='http://sizzlejs.com/'>http://sizzlejs.com/</a>&nbsp; <strong>&amp;</strong>
+&nbsp;<a href='http://mootools.net/docs/core/Slick/Slick'>http://mootools.net/docs/core/Slick/Slick</a>).&nbsp;
+Of course you may specify exactly which <acronym title='Cascading Style Sheet'>CSS</acronym>-Engine
+to use including any other similarly compatible.&nbsp;
+See the <code>UniDOM.CSSEngine</code> property specs below.</p>
+<p>¡Note that if you call <a href='#globalize'><code>UniDOM.globalize()</code></a> to use the
+global-functional <a href='#codeStyles'>programming style</a>,
+this method’s name <code>$</code> will over-write any same-named variable in the window,
+commonly used by jQuery and many other toolkits!</p>
+<dl class='params'>
+	<dt><code>CSSQueryString</code></dt>
+		<dd>String: A standard Cascading-Style-Sheet type of description to identify the Elements to be “gathered.”&nbsp;
+				The exact specifications of this query String may very slightly depending on
+				the “<acronym title='Cascading Style Sheet'>CSS</acronym>-Engine” you use.&nbsp;
+				Please refer to a good tutorial on using the native
+				JavaScript<mark class='macronym'>™</mark> <code>querySelectorAll</code> method,
+				or if using “Sizzle” or “Slick” (or another
+				<acronym title='Cascading Style Sheet'>CSS</acronym> Engine), their documentation.</dd>
+	<dt class='functional'><a href='#codeStyles'><code>element</code></a>
+			<span class='note'>*<span>only when called as a <a href='#codeStyles'>functional</a></span></span></dt>
+		<dd>The <acronym title='Document-Object Model'>DOM</acronym> Element from which to begin crawling the document.&nbsp;
+				You may pass in a single Element, or a UniDOM <a href="#ElementWrapper">ElementWrapper</a>.&nbsp;
+				Do <em>not</em> pass in a value for <code>element</code> when using <code>ElementWrapper</code>—
+				or prototype— based Object-oriented <a href='#codeStyles'>programming styles</a>;
+				using an Object-oriented style requires only 1 argument (plus any of the optional arguments),
+				as the element is then figured by this method’s Object.</dd>
+	<dt><code class='optArgs'>ojbFltr</code></dt>
+		<dd>An Object-property-name-filter function to enhance the returned Array value with named properties
+				referring to members of the Array.&nbsp; See: <a href='#objectify'><code>objectify</code></a>.</dd>
+	<dt><code class='optArgs'>applyDirect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply “power methods” directly to returned arrays?&nbsp;
+				See the <a href='#ElementWrapperArray'><code>UniDOM.ElementWrapperArray</code></a> constructor.</dd>
+	<dt><code class='optArgs'>powerSelect</code></dt>
+		<dd>Boolean:&nbsp; ¿Apply nonstandard methods (<code>getSelected()</code> &amp; <code>setSelected()</code>)
+				to <code>&lt;select&gt;</code> elements?&nbsp;
+				See: <a href='#powerSelect'><code>powerSelect</code></a>.</dd>
+</dl>
+<div class='returnValue'><h5>Return value:</h5>
+<p>If matching elements are found, returns an
+<a href='#ElementWrapperArray'><code>ElementWrapperArray</code></a>
+(a simple Array with added “UniDOM power methods”) of HTML elements (though there may only be one array member).&nbsp;
+Returns an empty array
+(or an empty “array-like Object: NodeList” when using the standard
+<acronym title='Document-Object Model'>DOM</acronym> <code>querySelectorAll</code> Engine)
+if no matches found.&nbsp;
+Note the elements returned are <em><strong>not</strong></em> individually wrapped with
+<a href='#ElementWrapper'><code>UniDOM.ElementWrapper</code></a>s;
+only the returned array has UniDOM’s “power-methods.”&nbsp;
+You can instead use the code: <code>UniDOM(CSSQueryString)</code>&nbsp; and
+the resulting array members <em><strong>will</strong></em> be individually “wrapped” with “power-methods,”
+as well as the returned array.</p>
+</div>
+<br /><!-- ouch! -->
+<div class='related properties'><h5>Related Properties</h5>
+<p>You may specify the “<acronym title='Cascading Style Sheet'>CSS</acronym>-Engine”
+of your choice by setting the static property
+<code>UniDOM.CSSEngine</code> <strong><em>before</em></strong> using UniDOM’s
+<code>$()</code> method or the related <code>UniDOM(CSSQueryString)</code>
+or <code>UniDOM(element‖ElementWrapper, CSSQueryString)</code> methods.&nbsp;
+Upon loading, UniDOM sets this property to the standard
+JavaScript<mark class='macronym'>™</mark> method <code>querySelectorAll</code>
+if it is available.&nbsp;
+Once you perform a <acronym title='Cascading Style Sheet'>CSS</acronym>-style
+query through UniDOM’s methods, the “<acronym title='Cascading Style Sheet'>CSS</acronym>-Engine” gets “locked”
+into UniDOM, and changing the value of <code>UniDOM.CSSEngine</code> will have no effect.</p>
+</div>
+</div><!--  close  $ CSSEngine  -->
+
+
+</section><!-- close .content -->
+<footer>
+<p>All content found on this page &amp; site Copyright © 2010, 2012, 2013, 2014 by SoftMoon WebWare and its owner,
+all rights reserved, unless otherwise specifically noted.&nbsp;
+Trademarks and Service-Marks are property of SoftMoon WebWare and its owner,
+all rights reserved, unless otherwise specifically noted.<br />
+
+<span class='notice'>“JavaScript<mark class='macronym'>™</mark>” is a trademark of Sun Microsystems.</span>
+
+<span class='notice'>“Microsoft<mark class='macronym'>®</mark>” &amp;
+“Internet Explorer<mark class='macronym'>®</mark>” are trademarks of Microsoft, Inc.</span>
+
+<span class='notice'>“Mozilla<mark class='macronym'>®</mark>” &amp;
+“Firefox<mark class='macronym'>®</mark>” are trademarks of Mozilla, Inc.</span>
+
+</footer>
+</body>
+</html>
