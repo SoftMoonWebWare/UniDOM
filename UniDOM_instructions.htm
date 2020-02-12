@@ -1096,10 +1096,10 @@ properly “firing” the custom event if it was registered using UniDOM’s <a 
 		<dd>An object with property names to define the specifications for the Event you want to generate.&nbsp;
 				Please refer to a good book on JavaScript<mark class='macronym'>™</mark> for further info.&nbsp;
 				Note you <strong>must</strong> supply a value for <code>eSpecs.view</code> if you want
-				to set any other explicit specifications (except <code>eSpecs.canBubble</code> and <code>eSpecs.cancelable</code>).&nbsp;
+				to set any other explicit specifications (except <code>eSpecs.bubbles</code> and <code>eSpecs.cancelable</code>).&nbsp;
 				Some example specs are below for all browsers <em><strong>except</strong></em> old MSIE:
 <table>
-	<tr><td><code>eSpecs.canBubble, eSpecs.cancelable</code></td><th>all Events</th></tr>
+	<tr><td><code>eSpecs.bubbles, eSpecs.cancelable</code></td><th>all Events</th></tr>
 	<tr><td><code>eSpecs.view, eSpecs.detail</code></td><th>UIEvents (includes key events and mouse events)</th></tr>
 	<tr><td><code>eSpecs.screenX, eSpecs.screenY, eSpecs.clientX, eSpecs.clientY,
 					eSpecs.ctrlKey, eSpecs.altKey, eSpecs.shiftKey, eSpecs.metaKey,
