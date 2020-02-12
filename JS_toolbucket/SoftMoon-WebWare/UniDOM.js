@@ -1,5 +1,5 @@
-﻿/*  UniDOM 2.1  July 31, 2015
- *  copyright © 2013, 2014, 2015 Joe Golembieski, SoftMoon-WebWare
+﻿/*  UniDOM 2.3  February 11, 2020
+ *  copyright © 2013, 2014, 2015, 2018, 2019, 2020 Joe Golembieski, SoftMoon-WebWare
  *  http://softmoon-webware.com/UniDOM_instructions.htm
  *
 		This program is free software: you can redistribute it and/or modify
@@ -214,7 +214,7 @@ UniDOM.addEventHandler=function(element, eventType, handler, useCapture)  {
 						if (typeof handler[j]['on'+event.type] == 'function')  handler[j]['on'+event.type].apply(handler[j], pass);
 						else if (typeof handler[j].handleEvent == 'function')  handler[j].handleEvent.apply(handler[j], pass);
 						else  handler[j].apply(element, pass);  }  }
-				if (capturerFired  ||  (is_customEvent  &&  event.canBubble  &&  !captured))  {
+				if (capturerFired  ||  (is_customEvent  &&  event.bubbles  &&  !captured))  {
 					event.captured=capturerFired;
 					event.eventPhase=3;
 					getAllEventsInWindow((element.ownerDocument  ||  element.document  ||  element).defaultView, false);
@@ -422,7 +422,7 @@ UniDOM.removeAllEventHandlers._apply_=Function.prototype.apply;
 //  only old-MSIE ‖or‖ Standards may be triggered if UniDOM.addEventHandler.retroMSIE9=Boolean(true‖false)
 UniDOM.generateEvent=function(element, eventType, eSpecs)  {  var i, j, p, d, eT, event;
 	element=xElement(element);
-	if (typeof eSpecs !== 'object')  eSpecs=new Object;
+	if (typeof eSpecs !== 'object')  eSpecs={bubbles: false};  //new Object;
 	eventType=arrayify(eventType);
 	for (i=0; i<eventType.length; i++)  {
 		eT=getEventType(eventType[i]);
@@ -435,11 +435,11 @@ UniDOM.generateEvent=function(element, eventType, eSpecs)  {  var i, j, p, d, eT
 				case 'click':
 					if (typeof MouseEvent === 'function')  event=new MouseEvent(eT, eSpecs); //allow newer properties when possible
 					else  { event=document.createEvent('MouseEvent');
-						event.initMouseEvent(eT, eSpecs.canBubble, eSpecs.cancelable,
+						event.initMouseEvent(eT, eSpecs.bubbles, eSpecs.cancelable,
 							eSpecs.view, eSpecs.detail,
 							eSpecs.screenX, eSpecs.screenY, eSpecs.clientX, eSpecs.clientY,
 							eSpecs.ctrlKey, eSpecs.altKey, eSpecs.shiftKey, eSpecs.metaKey,
-							eSpecs.button, eSpecs.relatedTarget);  }
+							eSpecs.button, eSpecs.relatedTarget);  }   //Note IE9 (at least) *requires* all arguments be passed. undefined values convert by default except:  eT, view, relatedTarget  are required valid
 				break;
 				case 'key':
 					if (typeof KeyboardEvent === 'function')  {event=new KeyboardEvent(eT, eSpecs);  break;}
@@ -451,20 +451,20 @@ UniDOM.generateEvent=function(element, eventType, eSpecs)  {  var i, j, p, d, eT
 				case 'scroll':
 					if (typeof UIEvent === 'function')  event=new UIEvent(eT, eSpecs);
 					else  { event=document.createEvent('UIEvent');
-						event.initUIEvent(eT, eSpecs.canBubble, eSpecs.cancelable,
+						event.initUIEvent(eT, eSpecs.bubbles, eSpecs.cancelable,
 							eSpecs.view, eSpecs.detail);  } //it is unclear what “detail” has to do with the keyboard, or how to set a key value except maybe through the eSpecs.userArgs
 				break;
 				default:  //Mouse & UI Events without user-defined eSpecs “should” auto-generate appropriate real-time values
-					if (eSpecs  &&  eSpecs.detail  &&  typeof CustomEvent === 'function')  event=new CustomEvent(eT, eSpecs);
+					if (eSpecs  &&  eSpecs.detail!==undefined  &&  typeof CustomEvent === 'function')  event=new CustomEvent(eT, eSpecs);
 					else
 					if (typeof Event === 'function')  event=new Event(eT, eSpecs);
 					else  { event=document.createEvent('Event');
-						event.initEvent(eT, eSpecs.canBubble, eSpecs.cancelable);  }  }
+						event.initEvent(eT, eSpecs.bubbles, eSpecs.cancelable);  }  }
 			//for (p in eSpecs)  {if (event[p] === undefined  &&  !event.hasOwnProperty(p))  event[p]=eSpecs[p];}
 			if (eSpecs.userArgs)  for (p in eSpecs.userArgs)  {event[p]=eSpecs.userArgs[p];}
 			element.dispatchEvent(event);  }
 		if (document.createEventObject  &&  (MS_exploder!==9  ||  UniDOM.addEventHandler.retroMSIE9!==false))  {  //old MSIE
-			event=document.createEventObject();  event.type=eT;  event.canBubble=eSpecs.canBubble;
+			event=document.createEventObject();  event.type=eT;  event.bubbles=eSpecs.bubbles;  // note that in reality, IE Events always bubble.  Here we just pass along a “request”.
 			if (eSpecs.userArgs)  for (p in eSpecs.userArgs)  {event[p]=eSpecs.userArgs[p];}
 			if (legacyEvents[eT])  element.fireEvent('on'+eT, event);
 			else  {  //old I.E. will choke on user-defined or modern event types
@@ -809,8 +809,13 @@ if (document.body.scrollWidth)  { // console.log('using dinosaur MSIE without a 
 
 	function useClass(c, b)  {  // c should be the string name of the class
 		if (b)  this.className=aClass(this.className, c);
-			else  this.className=xClass(this.className, c);  }
+		else  this.className=xClass(this.className, c);  }
 
+	function toggleClass(c)  {  // c should be the string name of the class
+		if (this.className.match(c))
+					this.className=xClass(this.className, c);
+		else  this.className=aClass(this.className, c);  }
+1
 
 	function swapOutClass(xc, ac)  {  // xc=remove class   ac=add class
 		var cn=xClass(this.className, xc);
@@ -1083,17 +1088,68 @@ UniDOM.getSelectedOptions=function(select, forceReturnArray) {return getSelected
 UniDOM.setSelectedOptions=function(select, value) {setSelected.call(select, value);};
 UniDOM.addPowerSelect=function(select) {select.getSelected=getSelectedOptions;  select.setSelected=setSelected;  return select;};
 
-SoftMoon.WebWare.objectifyArray=objectify;
-SoftMoon.WebWare.invoker=invoke;
-SoftMoon.WebWare.objHas=function(obj, conditions, filter) {return has.call(obj, conditions, filter);};
+UniDOM.objectifyArray=objectify;
+UniDOM.invoker=invoke;
+UniDOM.objHas=function(obj, conditions, filter) {return has.call(obj, conditions, filter);};
 
 Object.has=has;   //  myObject={};  myObject.has=Object.has;  flag=myObject.has(conditions, filter);
 //Object.prototype.has=has;  // a very poor idea but………
 
 
+// ******************************************************************** \\
+
+// If you set the  title  attribute of the <link> that loads the styleSheet, you may pass in a string
+//  containing that title attrubute value to reference the styleSheet.
+// Or you may pass in the indexNumber of the styleSheet or simply the styleSheet itself.
+UniDOM.Stylesheet=function(ss)  { var i;
+	if (this===UniDOM)  throw new Error("UniDOM.Stylesheet is a constructor, not a function");
+	if (typeof ss == 'number')  ss=document.styleSheets[ss];
+	else if (typeof ss == 'string')  for (i=0; i<document.styleSheets.length; i++)  {
+		if (document.styleSheets[i].title===ss)  {ss=document.styleSheets[i];  break;}  }
+	this.ss=ss;
+	this.initLength=this.getRules().length;  }
+
+UniDOM.Stylesheet.prototype.getRules=function()  {return  this.ss.cssRules || this.ss.rules;}
+
+// pass in a string of the selector text.
+// returns an array of indexNumbers that refer to that rule, in ¡reverse order! found in the stylesheet.
+// returns null if no match is found.
+UniDOM.Stylesheet.prototype.getRuleIndexes=function(s)  {
+	var rules=this.getRules();
+	if (!rules)  return null;
+	var i, found=new Array;
+	if (s instanceof RegExp)
+		for (i=rules.length; --i>=0;)  {if (rules[i].selectorText.match(s))  found.push(i);}
+	else
+		for (i=rules.length; --i>=0;)  {if (rules[i].selectorText===s)  found.push(i);}
+	if (found.length>0)  return found;  }
+
+UniDOM.Stylesheet.prototype.insertRule=function(selector, styles, n)  {
+	if (typeof n != 'number')  n=this.getRules().length;
+	if (this.ss.insertRule)  this.ss.insertRule(selector+'{'+styles+'}', n);
+	else
+	if (this.ss.addRule)  this.ss.addRule(selector, styles, n);
+	return n;  }
+
+UniDOM.Stylesheet.prototype.deleteRule=function(n)  {
+	if (typeof n === 'string'  ||  n instanceof RegExp)  n=this.getRuleIndexes(n);
+	else
+	if (typeof n === 'number')  n=[n];
+	else
+	if (!n instanceof Array)  n=[this.getRules().length-1];
+	for (var i=0; i<n.length; i++)  {
+		if (this.ss.deleteRule)  this.ss.deleteRule(n);
+		else
+		if (this.ss.removeRule)  this.ss.removeRule(n);  }
+	return n;  }
+
+
+// ******************************************************************** \\
+
+
 UniDOM.globalize=function(myWindow)  { //hog the space
 	if (myWindow===undefined)  myWindow=window;
-	console.log('UniDOM Functions and constructors that are now global: ====================');
+	console.log('UniDOM Functions and Constructors that are now global: ====================');
 	for (var p in UniDOM)  {
 		switch (p)  {
 		case 'CSSEngine':
