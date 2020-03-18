@@ -6,4 +6,4 @@ All the best of the tools in the original UniDOM cross-browser solution, without
 Gives you additional JavaScript tools for working with the DOM not found in jQuery and the like.
 Functional, Object, or optionally DOM Element prototype coding styles supported.
 
-
+p.s. the instructions need updating still...working on that in a bit
